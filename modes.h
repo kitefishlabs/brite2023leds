@@ -3,13 +3,17 @@
 #define DARK                               0
 #define TEST_CHASERS                       1
 
-#define LIGHT_A_SIDE                      10
-// #define FADE_A_SIDE                       11
+#define LIGHT_SIDES                       10
+#define ALTERNATE_SIDES_PERIOD_MS         200
+
+//#define FADE_SIDES                        11
 
 #define TRIGGER_LEVELS_DOWN               20
 #define TRIGGER_LEVELS_UP                 21
-// #define LOOP_LEVELS_DOWN                  24
-// #define LOOP_LEVELS_UP                    25
+
+#define LOOP_LEVELS_DOWN                  24
+#define LOOP_LEVELS_UP                    25
+
 
 
 // #define TRIGGER_ALL_LEVELS_RIGHT          22

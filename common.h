@@ -27,7 +27,7 @@
 #define NUM_COLOR_CHANNELS 4  // RGBW
 
 #define NUMSTRIPS 8 // 2 + 1 + 2, 2X
-#define NUM_LEDS_PER_STRIP 195
+#define NUM_LEDS_PER_STRIP 200
 // #define NUM_LEDS_PER_DOUBLE_STRIP 390
 #define TOTAL_LEDS 1560
 //  int8_t segments_path_follower[(LIGHTABLE_SEGMENTS * LOOKUP_COLS)] = {
@@ -35,7 +35,7 @@
 
 #define LIGHTABLE_LEDS 1560
 
-#define MASTER_BRIGHTNESS 164
+#define MASTER_BRIGHTNESS 200
 
 
 ///////
@@ -125,11 +125,11 @@ void log_leds(CRGBW leds[], int numLEDs) {
 }
 
 // CLEAR FUNCTIONS
-void clear_leds(I2SClocklessLedDriver driver, CRGB color = CRGB::Black) {
-  for(int i=0; i<TOTAL_LEDS ;i++) {
-    driver.setPixel(i,color.r,color.g,color.b, 0);
-  }
-}
+//void clear_leds(I2SClocklessLedDriver driver, CRGB color = CRGB::Black) {
+//  for(int i=0; i<TOTAL_LEDS ;i++) {
+//    driver.setPixel(i,color.r,color.g,color.b, 0);
+//  }
+//}
 
 void clear_hues(CHSV currentHues[], int num_hues, uint8_t hue=0, uint8_t sat=255, uint8_t valu=255) {
   for (int i=0;i<num_hues;i++) {
