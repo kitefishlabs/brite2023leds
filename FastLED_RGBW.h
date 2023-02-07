@@ -155,9 +155,9 @@ void rgbw2rgb(CRGBW leds[], size_t n_leds) {
     std::swap(temp.r, temp.g);
 
     // Reverse transformation
-    led.r = static_cast<uint8_t>(max(255.0f, round(temp.r + temp.w / whitepoint_red_factor)));
-    led.g = static_cast<uint8_t>(max(255.0f, round(temp.g + temp.w / whitepoint_green_factor)));
-    led.b = static_cast<uint8_t>(max(255.0f, round(temp.b + temp.w / whitepoint_blue_factor)));
+    led.r = static_cast<uint8_t>(max(255.0, round(temp.r + temp.w / whitepoint_red_factor)));
+    led.g = static_cast<uint8_t>(max(255.0, round(temp.g + temp.w / whitepoint_green_factor)));
+    led.b = static_cast<uint8_t>(max(255.0, round(temp.b + temp.w / whitepoint_blue_factor)));
     led.w = 0;
   }
 }

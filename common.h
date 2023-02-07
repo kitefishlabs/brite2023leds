@@ -30,6 +30,7 @@
 #define NUM_LEDS_PER_STRIP 195
 // #define NUM_LEDS_PER_DOUBLE_STRIP 390
 #define TOTAL_LEDS 1560
+//  int8_t segments_path_follower[(LIGHTABLE_SEGMENTS * LOOKUP_COLS)] = {
 // #define LOOKUP_COLS 4
 
 #define LIGHTABLE_LEDS 1560
@@ -74,19 +75,19 @@ int levels_up[8] = {0, 1, 2, 3, 4, 5, 6};
 
 // (14 * 2) + (7 * 4) + (8 * 2) = 28 + 28 + 16 = 72 * 11 per row = 864
 
-int8_t segments_path_follower[(LIGHTABLE_SEGMENTS * LOOKUP_COLS)] = { 
-   0,  0,  1, 31,
-   1,  1,  2,  0,
-   2,  3,  3,  1,
-   3,  4,  4,  2,
-   4,  5,  5,  3,
-   5,  6,  6,  4,
-   6,  8,  7,  5,
-   7,  9,  8,  6,
-   8, 10,  9,  7,
-   9, 11, 10,  8,
-  10, 13, 11,  9
-};
+// int8_t segments_path_follower[(LIGHTABLE_SEGMENTS * LOOKUP_COLS)] = { 
+//    0,  0,  1, 31,
+//    1,  1,  2,  0,
+//    2,  3,  3,  1,
+//    3,  4,  4,  2,
+//    4,  5,  5,  3,
+//    5,  6,  6,  4,
+//    6,  8,  7,  5,
+//    7,  9,  8,  6,
+//    8, 10,  9,  7,
+//    9, 11, 10,  8,
+//   10, 13, 11,  9
+// };
 
 
 

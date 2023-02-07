@@ -43,7 +43,7 @@ TOP - TBD, likely 3-4 loops around the structure, rough estimates below
 */
 
 // IPAddress IP_ADDRESS = IPAddress(192,168,0,120); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
-IPAddress IP_ADDRESS = IPAddress(192,168,0,121); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
+IPAddress IP_ADDRESS = IPAddress(192,168,0,122); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
 
 I2SClocklessLedDriver driver;
 
