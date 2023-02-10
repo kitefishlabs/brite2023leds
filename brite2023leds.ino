@@ -5,20 +5,24 @@
 #include "WiFi.h"
 #include <ETH.h>
 #include "AsyncUDP.h"
-// #include <OSCMessage.h>  /// https://github.com/CNMAT/OSC
-// #include <OSCBundle.h>  /// https://github.com/CNMAT/OSC
+ #include <OSCMessage.h>  /// https://github.com/CNMAT/OSC
+ #include <OSCBundle.h>  /// https://github.com/CNMAT/OSC
 
 #include "common.h"
 
-//#define ETHERNET_ACTIVE
+#define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = LIGHT_SIDES; // default = off
+int _mode = LOOP_LEVELS_SWEEP_UP_INIT; // default = off
 int __mode = _mode;
 
-int sd = 0;
+int __param0 = 100;
 
+int sd = 0;
+int lvl = 0;
+int offset = 10;
+int lvls[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 /* layout 
 
 BOTTOM - rough estimate, TODO plug in actual data
@@ -44,7 +48,7 @@ TOP - TBD, likely 3-4 loops around the structure, rough estimates below
 */
 
 // IPAddress IP_ADDRESS = IPAddress(192,168,0,120); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
-IPAddress IP_ADDRESS = IPAddress(192,168,0,122); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
+IPAddress IP_ADDRESS = IPAddress(192,168,0,101); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
 
 I2SClocklessLedDriver driver;
 
@@ -60,7 +64,7 @@ CHSV states_colors[LIGHTABLE_LEDS];
 // mark leds when they change (certain modes)
 bool states_dirty__flag[LIGHTABLE_LEDS];
 
-long counter = 0L;
+int counter = 0;
 
 
 AsyncUDP udp;
@@ -134,255 +138,13 @@ int levels[8][2][5] = {
   {{0, (    (PW[1]*2) + D[0]), (PW[0]*2),  1, 1},      {4, (   (PW[8]*2)+D[4]+(PW[9]*2))   , (PW[8]*2),   1, 1}}
 };
 
+// OSC Callback Functions (if necessary)
 
-/*  SEE END OF DOCUMENT  */
-
-void clear_leds() {
-  for (int i = 0; i < (NUMSTRIPS * NUM_LEDS_PER_STRIP); i++) {
-    driver.setPixel(i, 0, 0, 0);
-  }
-   driver.showPixels();
-}
-
-void reset() {
-
- Serial.print("RESET() MODE = "); Serial.println(_mode);
- clear_leds();
-// delay(50);
-}
-
-void setup() {
-
- Serial.begin(115200);
- Serial.println("Serial - initialize");
-
-#ifdef ETHERNET_ACTIVE 
- WiFi.onEvent(WiFiEvent);
- Serial.println("WiFi.onEvent");
-
- ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE);
- Serial.println("ETH begin");
- while (!eth_connected) {
-   Serial.print('.');
-   delay(500);
- }
- Serial.println();
-#endif
-
- Serial.print("LEDs per strip: "); Serial.println(NUM_LEDS_PER_STRIP);
- driver.initled((uint8_t*)leds,pins,NUMSTRIPS,NUM_LEDS_PER_STRIP,ORDER_GRBW); // (uint8_t*) leds are 4-uint8-wide
- driver.setBrightness(MASTER_BRIGHTNESS);
- Serial.print("master brightness: "); Serial.println(MASTER_BRIGHTNESS);
-
- reset();
-
-#ifdef ETHERNET_ACTIVE
- if(udp.listen(IP_ADDRESS, PORT)) {
-   Serial.println("UDP connected");
-   udp.onPacket([](AsyncUDPPacket packet) {
-    //  report_and_respond(packet, true, false);
-    //  OSCMessage msgIN;
-    //  for (int i=0; i<packet.length(); i++) {
-    //    msgIN.fill(*(packet.data()+i));
-    //  }
-    //  if(!msgIN.hasError()) {
-    //     msgIN.dispatch("/mode", receiveMode);
-    //  }
-   });
-   delay(500);
- }
-#endif
-   Serial.println("END SETUP");
-   counter = 0;
-   
-}
-
-
-int speed = 1;
-
-
-void trigger_side() {
-
-  sd = (sd + 1) % 2;
-
-  CRGB temp = CRGB(0, 0, 0);
-  example_blue = CHSV(beatsin8(3*speed,0,255), beatsin8(5*speed,120,240), beatsin8(7*speed,48,200));
-  hsv2rgb_rainbow( example_blue, temp);
-
-  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
-  
-  for (int i=0; i<8; i++) {
-    int r = sides[sd][i][0];
-    int o = sides[sd][i][1];
-    int l = sides[sd][i][2];
-    int d = sides[sd][i][3];
-    int lt = sides[sd][i][4];
-    int start = (r * 200) + o;
-    // Serial.print(r); Serial.print(" "); Serial.print(o); Serial.print(" "); Serial.print(l); Serial.print(" "); Serial.print(d); Serial.print("  - "); Serial.println(start);
-    // d can be negative!
-    if (d > 0) {  
-      Serial.print("A: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start); Serial.print(" "); Serial.println(start+(d*l));
-      for (int j=start; j<(start+(d*l)); j++) {
-//        driver.setPixel(j, 0, 0, 0);
-          driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
-      }
-    } else {
-      Serial.print("B: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start+(d*l)); Serial.print(" "); Serial.println(start);
-      for (int j=start-1; j>=(start+(d*l)); j--) {
-//        driver.setPixel(j, 0, 0, 0);
-//        Serial.print("[B]: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.println(j);
-        driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
-      }
-    }
-    
-//    r = sides[1-sd][i][0];
-//    o = sides[1-sd][i][1];
-//    l = sides[1-sd][i][2];
-//    d = sides[1-sd][i][3];
-//    lt = sides[1-sd][i][4];
-//    start = (r * 200) + o;
-//    // Serial.print(r); Serial.print(" "); Serial.print(o); Serial.print(" "); Serial.print(l); Serial.print(" "); Serial.print(d); Serial.print("  - "); Serial.println(start);
-//    // d can be negative!
-//    if (d > 0) {
-//      Serial.print("C: "); Serial.print(start); Serial.print(" "); Serial.println(start+(d*l));
-//      for (int j=start; j<(start+(d*l)); j++) {
-//        driver.setPixel(j, 0, 0, 0);
-//      }
-//    } else {
-//      Serial.print("D: "); Serial.print(start+(d*l)); Serial.print(" "); Serial.println(start);
-//      for (int j=start-1; j>=(start+(d*l)); j--) {
-//        driver.setPixel(j, 0, 0, 0);
-//      }
-//    }
-  }
-}
-
-
-
-void trigger_level() {
-  
-  int lvl = (lvl + 1) % 8;
-
-  CRGB temp = CRGB(0, 0, 0);
-  example_blue = CHSV(beatsin8(3*speed,0,255), beatsin8(5*speed,120,240), beatsin8(7*speed,48,200));
-  hsv2rgb_rainbow( example_blue, temp);
-
-  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
-
-//  for (int i=0; i<2; i++) {
-//    int r = sides[i][lvl][0];
-//    int o = sides[i][lvl][1];
-//    int l = sides[i][lvl][2];
-//    int d = sides[i][lvl][3];
-//    int lt = sides[i][lvl][4];
-//
-//
-//  for (int i=0; i<2; i++) {
-//    int r = sides[i][lvl][0];
-//    int o = sides[i][lvl][1];
-//    int l = sides[i][lvl][2];
-//    int d = sides[i][lvl][3];
-//    int lt = sides[i][lvl][4];
-//
-//    
-//    
-//    if (d > 0) {  
-//      for (int j=start; j<(start+(d*l)); j++) {
-//        if (lt > 0) {
-//          driver.setPixel(j, temp.r, temp.g, temp.b, MASTER_BRIGHTNESS/4);
-//        } else {
-//          driver.setPixel(j, temp.r, temp.g, temp.b, 0);
-//        }
-//      }
-//    } else {
-//      for (int j=start; j>(start+(d*l)); j--) {
-//        if (lt > 0) {
-//          driver.setPixel(j, temp.r, temp.g, temp.b, MASTER_BRIGHTNESS/4);
-//        } else {
-//          driver.setPixel(j, temp.r, temp.g, temp.b, 0);
-//        }
-//      }
-//    }
-//  }
-//
-//  driver.showPixels();
-//  delay(dly_t);
-}
-
-//int off=0;
-//long time1,time2,time3;
-
-void loop() {
-
-//  time1=ESP.getCycleCount();
-
-//  Serial.print("Mode: "); Serial.println(_mode);
-
-  if (__mode != _mode) {
-    Serial.print("Mode changed: "); Serial.println(_mode);
-    _mode = __mode;
-    reset();
-    counter = 0;
-  }
-  
-  if (_mode == DARK) {
-
-    clear_leds();
-    
-//  } 
-//  else if (_mode == ITERATE_TEST) {
-//
-//    for (int x=0; x<8; x++) {
-//      trigger_level(x);
-//      driver.showPixels();
-//      delay(500);
-//    }
-
-  } else if (_mode == TEST_CHASERS) {
-
-    clear_leds();
-    test_all_with_chasers();
-    // calls show and delay internally
-
-  } else if (_mode == LIGHT_SIDES) {
-
-    EVERY_N_MILLISECONDS(ALTERNATE_SIDES_PERIOD_MS) {
-      clear_leds();
-      trigger_side();
-      driver.showPixels();
-    }
-
-  } else if (_mode == TRIGGER_LEVELS_UP) {
-
-    for (int x=0; x<8; x++) {
-      clear_leds();
-      trigger_level();
-    }
-
-
-  } else if (_mode == TRIGGER_LEVELS_DOWN) {
-    
-    for (int x=0; x<8; x++) {
-      clear_leds();
-      // invert
-      trigger_level();
-    }
-
-
-  } else {
-    ;
-  }
-
-//  counter++;
-//  time2=ESP.getCycleCount();
-//  driver.showPixels();
-//  time3=ESP.getCycleCount();
-//  Serial.printf("Calcul pixel fps:%.2f   showPixels fps:%.2f   Total fps:%.2f \n",(float)240000000/(time2-time1),(float)240000000/(time3-time2),(float)240000000/(time3-time1));
-//  off++;
-  // delay(2000);
-
-  delay(10);
-
+void receiveMode(OSCMessage &msg) {
+  __mode = int(msg.getInt(0));
+  __param0 = int(msg.getInt(1));
+  Serial.print("mode to be: "); Serial.println(__mode);
+  Serial.print("Params: "); Serial.println(__param0);
 }
 
 
@@ -425,14 +187,337 @@ void WiFiEvent(WiFiEvent_t event) {
 }
 #endif
 
-// OSC Callback Functions (if necessary)
+
+
+/*  SEE END OF DOCUMENT  */
+
+void clear_leds(uint16_t rolloff=0) {
+//  Serial.print("R:: "); Serial.println(rolloff);
+  for (int i = 0; i < (NUMSTRIPS * NUM_LEDS_PER_STRIP); i++) {
+    driver.setPixel(i, 0, 0, 0);
+  }
+   driver.showPixels();
+}
+
+void reset() {
+
+ Serial.print("RESET() MODE = "); Serial.println(_mode);
+ clear_leds();
+// delay(50);
+}
+
+void setup() {
+
+ Serial.begin(115200);
+ Serial.println("Serial - initialize");
+
+#ifdef ETHERNET_ACTIVE 
+ WiFi.onEvent(WiFiEvent);
+ Serial.println("WiFi.onEvent");
+
+ ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE);
+ Serial.println("ETH begin");
+ while (!eth_connected) {
+   Serial.print('.');
+   delay(500);
+ }
+ Serial.println();
+#endif
+
+ Serial.print("LEDs per strip: "); Serial.println(NUM_LEDS_PER_STRIP);
+ driver.initled((uint8_t*)leds,pins,NUMSTRIPS,NUM_LEDS_PER_STRIP,ORDER_GRBW); // (uint8_t*) leds are 4-uint8-wide
+ driver.setBrightness(MASTER_BRIGHTNESS);
+ Serial.print("master brightness: "); Serial.println(MASTER_BRIGHTNESS);
+
+ reset();
+
+#ifdef ETHERNET_ACTIVE
+ if(udp.listen(IP_ADDRESS, PORT)) {
+   Serial.println("UDP connected");
+   udp.onPacket([](AsyncUDPPacket packet) {
+//      report_and_respond(packet, true, false);
+      OSCMessage msgIN;
+      Serial.println(packet.length());
+      for (int i=0; i<packet.length(); i++) {
+        msgIN.fill(*(packet.data()+i));
+      }
+      if(!msgIN.hasError()) {
+         msgIN.dispatch("/mode", receiveMode);
+      }
+   });
+   delay(500);
+ }
+#endif
+   Serial.println("END SETUP");
+   counter = 0;
+   
+}
+
+
+int speed = 1;
+
+
+void trigger_side() {
+
+  sd = (sd + 1) % 2;
+
+  CRGB temp = CRGB(0, 0, 0);
+  example_blue = CHSV(beatsin8(3*speed,0,255), beatsin8(5*speed,120,240), beatsin8(7*speed,48,200));
+  hsv2rgb_rainbow( example_blue, temp);
+
+//  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
+  
+  for (int i=0; i<8; i++) {
+    int r = sides[sd][i][0];
+    int o = sides[sd][i][1];
+    int l = sides[sd][i][2];
+    int d = sides[sd][i][3];
+    int lt = sides[sd][i][4];
+    int start = (r * 200) + o;
+    // Serial.print(r); Serial.print(" "); Serial.print(o); Serial.print(" "); Serial.print(l); Serial.print(" "); Serial.print(d); Serial.print("  - "); Serial.println(start);
+    // d can be negative!
+    if (d > 0) {  
+//      Serial.print("A: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start); Serial.print(" "); Serial.println(start+(d*l));
+      for (int j=start; j<(start+(d*l)); j++) {
+          driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+      }
+    } else {
+//      Serial.print("B: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start+(d*l)); Serial.print(" "); Serial.println(start);
+      for (int j=start-1; j>=(start+(d*l)); j--) {
+        driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+      }
+    }
+  }
+}
+
+
+/*
+ * Produces next value in series.
+ * 
+ * Can produce different patterns based on delta
+ * Lo and Hi contrain the range
+ * 
+ * Delta can be +/-, larger values make larger leaps
+ * 
+ */
+int iter_delta(int val, int delta, int lo=0, int hi=256) {
+  return ((((val + delta) - lo) % (hi - lo)) + lo);
+}
 
 
 
-// void receiveMode(OSCMessage &msg) {
-//   __mode = int(msg.getInt(0));
-//   Serial.print("mode to be: "); Serial.println(__mode);
-// }
+void trigger_level(int dir) {
+  
+  lvl = iter_delta(lvl, dir, 0, 8);
+
+  CRGB temp = CRGB(0, 0, 0);
+  example_blue = CHSV(beatsin8(3*speed,0,255), beatsin8(5*speed,120,240), beatsin8(7*speed,48,200));
+  hsv2rgb_rainbow( example_blue, temp);
+
+//  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
+
+  for (int i=0; i<2; i++) {
+    
+    int r = sides[i][lvl][0];
+    int o = sides[i][lvl][1];
+    int l = sides[i][lvl][2];
+    int d = sides[i][lvl][3];
+    int lt = sides[i][lvl][4];
+    int start = (r * 200) + o;
+    // Serial.print(r); Serial.print(" "); Serial.print(o); Serial.print(" "); Serial.print(l); Serial.print(" "); Serial.print(d); Serial.print("  - "); Serial.println(start);
+    // d can be negative!
+    if (d > 0) {  
+//      Serial.print("A: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start); Serial.print(" "); Serial.println(start+(d*l));
+      for (int j=start; j<(start+(d*l)); j++) {
+          driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+      }
+    } else {
+//      Serial.print("B: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start+(d*l)); Serial.print(" "); Serial.println(start);
+      for (int j=start-1; j>=(start+(d*l)); j--) {
+        driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+      }
+    }
+  }
+}
+
+
+void trigger_level_sweep(int dir) {
+
+  CRGB temp = CRGB(0, 0, 0);
+  example_blue = CHSV(beatsin8(3*speed,0,255), beatsin8(5*speed,120,240), beatsin8(7*speed,48,200));
+  hsv2rgb_rainbow( example_blue, temp);
+
+//  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
+
+//  every tenth tick, look ahead to see if next level is zeroed out (if not zeroed out, we wait)
+  Serial.print("counter = "); Serial.print(counter); Serial.print(" "); Serial.println(((lvl+1)%8));
+  if (((counter % 10) == 0) && (lvls[((lvl+1)%8)] == 0)) {
+    lvl = (lvl + dir) % 8;
+    if (lvl == 0) {
+      sd = 1 - sd;
+      Serial.print("lvl == 0 detected sd="); Serial.println(sd);
+    }
+    Serial.print("LVL: ");  Serial.println(lvl);
+    lvls[lvl] = 1;
+  }
+  Serial.print("lvl: ");  Serial.println(lvl);
+  for (int ll = 0; ll < 8; ll++) {
+    Serial.println(ll);  
+    if (lvls[ll] >= 0) {
+      
+      int r = sides[sd][ll][0];
+      int o = sides[sd][ll][1];
+      int l = sides[sd][ll][2];
+      int d = sides[sd][ll][3];
+      int lt = sides[sd][ll][4];
+      int start = (r * 200) + o;
+      
+      if (d>0) {
+      
+        int j = start + lvls[ll];
+        driver.setPixel(j, temp.r, temp.g, temp.b);
+        if (j >= start+(d*l)) {
+          lvls[ll] = 0;
+          Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
+        } else {
+          lvls[ll] = lvls[ll] + 1;
+        }
+      
+      } else {
+      
+        int j = start - 1 - lvls[ll];
+        driver.setPixel(j, temp.r, temp.g, temp.b);
+        if (j <= (start+(d*l))) {
+          lvls[ll] = 0;
+          Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
+        } else {
+          lvls[ll] = lvls[ll] + 1;
+        }
+      }
+    }
+  }
+  counter = (counter + 1) % 10000;
+//  delay(2);
+}
+
+int hb_ = 0;
+//int off=0;
+//long time1,time2,time3;
+
+void loop() {
+
+//  time1=ESP.getCycleCount();
+
+//  Serial.print("Mode: "); Serial.println(_mode);
+
+  if (__mode != _mode) {
+    Serial.print("Mode changed: "); Serial.println(_mode);
+    _mode = __mode;
+    reset();
+    counter = 0;
+  }
+  
+  if (_mode == DARK) {
+
+    clear_leds(max(0, __param0));
+    
+//  } 
+//  else if (_mode == ITERATE_TEST) {
+//
+//    for (int x=0; x<8; x++) {
+//      trigger_level(x);
+//      driver.showPixels();
+//      delay(500);
+//    }
+
+  } else if (_mode == TEST_CHASERS) {
+
+    clear_leds();
+      Serial.println("test_all_with_chasers()");
+    // calls show and delay internally
+
+  } else if (_mode == LIGHT_SIDES) {
+
+//    int hb = beatsin8(int(60000 / __param0), 0, 255);
+//    
+//    Serial.print(hb); Serial.print(" ");
+//    Serial.print(hb_); Serial.print(" ");
+    Serial.println(__param0); 
+    
+    if ((millis() % __param0) < 10) {
+      clear_leds();
+      trigger_side();
+      driver.showPixels();
+//      hb_ = hb;
+    }
+
+
+  } else if (_mode == TRIGGER_LEVELS_UP) {
+
+    if ((millis() % __param0) < 10) {
+      clear_leds();
+      trigger_level(1);
+      driver.showPixels();
+    }
+
+  } else if (_mode == TRIGGER_LEVELS_DOWN) {
+    
+    if ((millis() % __param0) < 10) {
+      clear_leds();
+      trigger_level(-1);
+      driver.showPixels();
+    }
+
+  } else if (_mode == LOOP_LEVELS_SWEEP_UP_INIT) {
+
+    Serial.println("LOOP_LEVELS_SWEEP_UP_INIT");
+    Serial.println(counter);
+    sd = 0;
+    lvl = -1;
+    __mode = LOOP_LEVELS_SWEEP_UP;
+    delay(2);
+
+  } else if (_mode == LOOP_LEVELS_SWEEP_UP) {
+    
+    if ((millis() % __param0) < 10) {
+//      clear_leds();
+      trigger_level_sweep(1);
+      driver.showPixels();
+    }
+
+  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN_INIT) {
+
+    sd = 0;
+    lvl = 0;
+    __mode = LOOP_LEVELS_SWEEP_DOWN;
+
+  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN) {
+    
+    if ((millis() % __param0) < 10) {
+      clear_leds();
+      trigger_level_sweep(-1);
+      driver.showPixels();
+    }
+
+
+  } else {
+    ;
+  }
+
+//  counter++;
+//  time2=ESP.getCycleCount();
+//  driver.showPixels();
+//  time3=ESP.getCycleCount();
+//  Serial.printf("Calcul pixel fps:%.2f   showPixels fps:%.2f   Total fps:%.2f \n",(float)240000000/(time2-time1),(float)240000000/(time3-time2),(float)240000000/(time3-time1));
+//  off++;
+  // delay(2000);
+
+  delay(10);
+
+}
+
+
+
 
 
 
@@ -542,30 +627,30 @@ G  -  (r,o,l,d)
 
 
 
-void test_all_with_chasers() {
-
-  clear_leds();
-
-  for (int i = 0; i < NUM_LEDS_PER_STRIP; i++) {
-
-    if (random(1000) < 200) {
-      currentHue = CHSV(currentHue.h + uint8_t(random(12)), currentHue.s + uint8_t(random(32)), currentHue.v + uint8_t(random(5)) );
-      hsv2rgb_rainbow( currentHue, currentRGB);
-    
-      Serial.print(currentHue.h); Serial.print(" ");
-      Serial.print(currentHue.s); Serial.print(" ");
-      Serial.print(currentHue.v); Serial.print(" ");
-      Serial.println("");
-    }
-    
-    for (int j = 0; j < NUMSTRIPS; j++) {
-      driver.setPixel(((j * NUM_LEDS_PER_STRIP) + i) % (NUMSTRIPS * NUM_LEDS_PER_STRIP), currentRGB.r, currentRGB.g, currentRGB.b, MASTER_BRIGHTNESS);
-      driver.setBrightness(MASTER_BRIGHTNESS);
-    }
-    driver.showPixels();
-    delay(2);
-    
-  }
-  delay(2000);
-    
-}
+//void test_all_with_chasers() {
+//
+//  clear_leds();
+//
+//  for (int i = 0; i < NUM_LEDS_PER_STRIP; i++) {
+//
+//    if (random(1000) < 200) {
+//      currentHue = CHSV(currentHue.h + uint8_t(random(12)), currentHue.s + uint8_t(random(32)), currentHue.v + uint8_t(random(5)) );
+//      hsv2rgb_rainbow( currentHue, currentRGB);
+//    
+//      Serial.print(currentHue.h); Serial.print(" ");
+//      Serial.print(currentHue.s); Serial.print(" ");
+//      Serial.print(currentHue.v); Serial.print(" ");
+//      Serial.println("");
+//    }
+//    
+//    for (int j = 0; j < NUMSTRIPS; j++) {
+//      driver.setPixel(((j * NUM_LEDS_PER_STRIP) + i) % (NUMSTRIPS * NUM_LEDS_PER_STRIP), currentRGB.r, currentRGB.g, currentRGB.b, MASTER_BRIGHTNESS);
+//      driver.setBrightness(MASTER_BRIGHTNESS);
+//    }
+//    driver.showPixels();
+//    delay(2);
+//    
+//  }
+//  delay(2000);
+//    
+//}

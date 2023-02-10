@@ -4,15 +4,17 @@
 #define TEST_CHASERS                       1
 
 #define LIGHT_SIDES                       10
-#define ALTERNATE_SIDES_PERIOD_MS         200
+#define ALTERNATE_SIDES_PERIOD_MS         2000
 
 //#define FADE_SIDES                        11
 
 #define TRIGGER_LEVELS_DOWN               20
 #define TRIGGER_LEVELS_UP                 21
 
-#define LOOP_LEVELS_DOWN                  24
-#define LOOP_LEVELS_UP                    25
+#define LOOP_LEVELS_SWEEP_DOWN                  25
+#define LOOP_LEVELS_SWEEP_DOWN_INIT            125
+#define LOOP_LEVELS_SWEEP_UP                    26
+#define LOOP_LEVELS_SWEEP_UP_INIT              126
 
 
 
