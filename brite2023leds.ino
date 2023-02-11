@@ -10,16 +10,17 @@
 
 
 #include "leds_chasers_test.h"
-#include "light_side.h"
+#include "leds_light_side.h"
+#include "leds_trigger_level.h"
 
-//#define ETHERNET_ACTIVE
+#define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = LIGHT_SIDES; // default = off
+int _mode = TRIGGER_LEVELS_UP; // default = off
 int __mode = _mode;
 
-int __param0 = 100;
+int __param0 = 500;
 
 int sd = 0;
 int lvl = 0;
@@ -91,56 +92,8 @@ CHSV example_blue = CHSV(0, 120,64);
 
 LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
+LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
 
-
-//int sides[2][8][5] = {
-//  {
-//    {3,  (H + (PW[7]*2)),          (PW[7]*2), -1, 1},
-//    {3,  (H + (PW[7]*2) + D[3]),   (PW[6]*2),  1, 1},
-//    {2,       (PW[5]*2),           (PW[5]*2), -1, 1},
-//    {2,      ((PW[5]*2) + D[2]),   (PW[4]*2),  1, 1},
-//    {1,       (PW[3]*2),           (PW[3]*2), -1, 1},
-//    {1,      ((PW[3]*2) + D[1]),   (PW[2]*2),  1, 1},
-//    {0,       (PW[1]*2),           (PW[1]*2), -1, 1},
-//    {0,      ((PW[1]*2) + D[0]),   (PW[0]*2),  1, 1}
-//    
-////    {3,  (H + (PW[7]*2)),          D[3], 1, 0},     // goal is to never use these, perhaps only use for testing
-////    {2,  (H + (PW[5]*2)),          D[2], 1, 0},
-////    {1,  (H + (PW[3]*2)),          D[1], 1, 0},
-////    {0,  (H + (PW[1]*2)),          D[0], 1, 0}
-//  },
-//
-//  // (3, (35 * 2) + 10, (34 * 2), 1) = 450 + 70 + 10, 68 = (522 590)   -- idx 0
-//  // (1, (39 * 2)     , (39 * 2), 1) = 150 + 78 + 10, 78 = (238 316)   -- idx 5
-//  // (0, (41 * 2)     , (41 * 2), 1) =   0 + 82 + 10, 82 = (92 174)   -- idx 7
-//
-//  {
-//    {7,  H,                               (PW[15]*2),  1, 1},
-//    {7, (H + (PW[15]*2)+D[7]+(PW[14]*2)), (PW[14]*2), -1, 1},
-//    {6,  0,                               (PW[13]*2),  1, 1},
-//    {6, (    (PW[13]*2)+D[6]+(PW[12]*2)), (PW[12]*2), -1, 1},
-//    {5,  0,                               (PW[11]*2),  1, 1},
-//    {5, (    (PW[11]*2)+D[5]+(PW[10]*2)), (PW[10]*2), -1, 1},
-//    {4,  0,                               (PW[9]*2),   1, 1},
-//    {4, (    (PW[9]*2)+D[4]+(PW[8]*2)),   (PW[8]*2),  -1, 1} //,
-//    
-////    {7,  (H + (PW[15]*2)),                D[7],       0, 0},
-////    {6,  (H + (PW[13]*2)),                D[6],       0, 0},
-////    {5,  (H + (PW[11]*2)),                D[5],       0, 0},
-////    {4,  (H + (PW[9]*2)),                 D[4],       0, 0}    
-//  }
-//};
-
-int levels[8][2][5] = {
-  {{3, (H + (PW[7]*2))       , (PW[7]*2), -1, 1},      {7,  H                              , (PW[15]*2), -1, 1}}, // could knock out zeros as documentation here and all further... todo
-  {{3, (H + (PW[7]*2) + D[3]), (PW[6]*2),  1, 1},      {7, (H + (PW[14]*2)+D[7]+(PW[15]*2)), (PW[14]*2),  1, 1}},
-  {{2,      (PW[5]*2)        , (PW[5]*2), -1, 1},      {6,  0                              , (PW[13]*2), -1, 1}},
-  {{2, (    (PW[5]*2) + D[2]), (PW[4]*2),  1, 1},      {6, (    (PW[12]*2)+D[6]+(PW[13]*2)), (PW[12]*2),  1, 1}},
-  {{2,      (PW[3]*2)        , (PW[3]*2), -1, 1},      {5,  0                              , (PW[11]*2), -1, 1}},
-  {{1, (    (PW[3]*2) + D[1]), (PW[2]*2),  1, 1},      {5, (    (PW[10]*2)+D[5]+(PW[11]*2)), (PW[10]*2),  1, 1}},
-  {{0,      (PW[1]*2)        , (PW[1]*2), -1, 1},      {4,  0                              , (PW[9]*2),  -1, 1}},
-  {{0, (    (PW[1]*2) + D[0]), (PW[0]*2),  1, 1},      {4, (   (PW[8]*2)+D[4]+(PW[9]*2))   , (PW[8]*2),   1, 1}}
-};
 
 // OSC Callback Functions (if necessary)
 
@@ -190,7 +143,6 @@ void WiFiEvent(WiFiEvent_t event) {
  }
 }
 #endif
-
 
 
 /*  SEE END OF DOCUMENT  */
@@ -257,67 +209,9 @@ void setup() {
 
 
   lightSides.init();
+  triggerLevels.init();
 }
 
-
-//void trigger_level_sweep(int dir) {
-//
-//  CRGB temp = CRGB(0, 0, 0);
-//  example_blue = CHSV(beatsin8(3*speed,0,255), beatsin8(5*speed,120,240), beatsin8(7*speed,48,200));
-//  hsv2rgb_rainbow( example_blue, temp);
-//
-////  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
-//
-////  every tenth tick, look ahead to see if next level is zeroed out (if not zeroed out, we wait)
-//  Serial.print("counter = "); Serial.print(counter); Serial.print(" "); Serial.println(((lvl+1)%8));
-//  if (((counter % 10) == 0) && (lvls[((lvl+1)%8)] == 0)) {
-//    lvl = (lvl + dir) % 8;
-//    if (lvl == 0) {
-//      sd = 1 - sd;
-//      Serial.print("lvl == 0 detected sd="); Serial.println(sd);
-//    }
-//    Serial.print("LVL: ");  Serial.println(lvl);
-//    lvls[lvl] = 1;
-//  }
-//  Serial.print("lvl: ");  Serial.println(lvl);
-//  for (int ll = 0; ll < 8; ll++) {
-//    Serial.println(ll);  
-//    if (lvls[ll] >= 0) {
-//      
-//      int r = sides[sd][ll][0];
-//      int o = sides[sd][ll][1];
-//      int l = sides[sd][ll][2];
-//      int d = sides[sd][ll][3];
-//      int lt = sides[sd][ll][4];
-//      int start = (r * 200) + o;
-//      
-//      if (d>0) {
-//      
-//        int j = start + lvls[ll];
-//        driver->setPixel(j, temp.r, temp.g, temp.b);
-//        if (j >= start+(d*l)) {
-//          lvls[ll] = 0;
-//          Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
-//        } else {
-//          lvls[ll] = lvls[ll] + 1;
-//        }
-//      
-//      } else {
-//      
-//        int j = start - 1 - lvls[ll];
-//        driver->setPixel(j, temp.r, temp.g, temp.b);
-//        if (j <= (start+(d*l))) {
-//          lvls[ll] = 0;
-//          Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
-//        } else {
-//          lvls[ll] = lvls[ll] + 1;
-//        }
-//      }
-//    }
-//  }
-//  counter = (counter + 1) % 10000;
-////  delay(2);
-//}
 
 void loop() {
   
@@ -350,22 +244,25 @@ void loop() {
       
     }
 
-//  } else if (_mode == TRIGGER_LEVELS_UP) {
-//
-//    if ((millis() % __param0) < 10) {
-//      clear_leds();
-//      trigger_level(1);
-//      driver->showPixels();
-//    }
-//
+  } else if (_mode == TRIGGER_LEVELS_UP) {
+
+    if ((millis() % __param0) < 10) {
+      clear_leds();
+
+      // up is down, down is up, peace is war
+      triggerLevels.update_model(-1);
+      triggerLevels.loop();
+    }
+
 //  } else if (_mode == TRIGGER_LEVELS_DOWN) {
 //    
 //    if ((millis() % __param0) < 10) {
 //      clear_leds();
-//      trigger_level(-1);
-//      driver->showPixels();
+//      
+//      triggerLevels.update_model(1);
+//      triggerLevels.loop();
 //    }
-//
+
 //  } else if (_mode == LOOP_LEVELS_SWEEP_UP_INIT) {
 //
 //    Serial.println("LOOP_LEVELS_SWEEP_UP_INIT");
