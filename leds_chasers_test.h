@@ -28,10 +28,10 @@ public:
   };
 
   void setup() {
-    // currentHue_ = CHSV(0,0,0);
-    // currentRGB_ = CRGB(0,0,0);
-    index = 0;
-    prob = 200;
+    // this->currentHue_ = CHSV(0,0,0);
+    // this->currentRGB_ = CRGB(0,0,0);
+    this->index = 0;
+    this->prob = 200;
   }
 
   void update_model() {
