@@ -1,3 +1,5 @@
+#ifndef LEDS_COMMON
+#define LEDS_COMMON
 #include <FastLED.h>
 #include "I2SClocklessLedDriver.h"
 #include "FastLED_RGBW.h"
@@ -35,7 +37,7 @@
 
 #define LIGHTABLE_LEDS 1560
 
-#define MASTER_BRIGHTNESS 200
+#define MASTER_BRIGHTNESS 128
 
 
 ///////
@@ -136,3 +138,87 @@ void clear_hues(CHSV currentHues[], int num_hues, uint8_t hue=0, uint8_t sat=255
     currentHues[i] = CHSV(hue, sat, valu);
   }
 }
+
+
+
+int PW[16] = {47,47,45,43,42,41,38,38, 47,47,45,43,42,41,38,38};
+int H = 14;
+int D[8] = { 8, 9, 9, 8, 8, 9, 8, 8 };
+
+int SIDES[2][8][5] = {
+  {
+    {3,  (H + (PW[7]*2)),          (PW[7]*2), -1, 1},
+    {3,  (H + (PW[7]*2) + D[3]),   (PW[6]*2),  1, 1},
+    {2,       (PW[5]*2),           (PW[5]*2), -1, 1},
+    {2,      ((PW[5]*2) + D[2]),   (PW[4]*2),  1, 1},
+    {1,       (PW[3]*2),           (PW[3]*2), -1, 1},
+    {1,      ((PW[3]*2) + D[1]),   (PW[2]*2),  1, 1},
+    {0,       (PW[1]*2),           (PW[1]*2), -1, 1},
+    {0,      ((PW[1]*2) + D[0]),   (PW[0]*2),  1, 1}
+    
+//    {3,  (H + (PW[7]*2)),          D[3], 1, 0},     // goal is to never use these, perhaps only use for testing
+//    {2,  (H + (PW[5]*2)),          D[2], 1, 0},
+//    {1,  (H + (PW[3]*2)),          D[1], 1, 0},
+//    {0,  (H + (PW[1]*2)),          D[0], 1, 0}
+  },
+
+  // (3, (35 * 2) + 10, (34 * 2), 1) = 450 + 70 + 10, 68 = (522 590)   -- idx 0
+  // (1, (39 * 2)     , (39 * 2), 1) = 150 + 78 + 10, 78 = (238 316)   -- idx 5
+  // (0, (41 * 2)     , (41 * 2), 1) =   0 + 82 + 10, 82 = (92 174)   -- idx 7
+
+  {
+    {7,  H,                               (PW[15]*2),  1, 1},
+    {7, (H + (PW[15]*2)+D[7]+(PW[14]*2)), (PW[14]*2), -1, 1},
+    {6,  0,                               (PW[13]*2),  1, 1},
+    {6, (    (PW[13]*2)+D[6]+(PW[12]*2)), (PW[12]*2), -1, 1},
+    {5,  0,                               (PW[11]*2),  1, 1},
+    {5, (    (PW[11]*2)+D[5]+(PW[10]*2)), (PW[10]*2), -1, 1},
+    {4,  0,                               (PW[9]*2),   1, 1},
+    {4, (    (PW[9]*2)+D[4]+(PW[8]*2)),   (PW[8]*2),  -1, 1} //,
+    
+//    {7,  (H + (PW[15]*2)),                D[7],       0, 0},
+//    {6,  (H + (PW[13]*2)),                D[6],       0, 0},
+//    {5,  (H + (PW[11]*2)),                D[5],       0, 0},
+//    {4,  (H + (PW[9]*2)),                 D[4],       0, 0}    
+  }
+};
+
+
+
+
+
+
+
+/*
+ * Produces next value in series.
+ * 
+ * Can produce different patterns based on delta
+ * Lo and Hi contrain the range
+ * 
+ * Delta can be +/-, larger values make larger leaps
+ * 
+ */
+int iter_delta(int val, int delta, int lo=0, int hi=256) {
+  return ((((val + delta) - lo) % (hi - lo)) + lo);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif

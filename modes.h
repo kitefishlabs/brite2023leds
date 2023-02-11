@@ -1,4 +1,5 @@
-// MODES
+#ifndef LEDS_MODES
+#define LEDS_MODES
 
 #define DARK                               0
 #define TEST_CHASERS                       1
@@ -53,3 +54,5 @@
 // #define LOOP_PANELS_STRIPES_UP_RIGHT      65
 // #define LOOP_PANELS_STRIPES_DOWN_LEFT     66
 // #define LOOP_PANELS_STRIPES_DOWN_RIGHT    67
+
+#endif

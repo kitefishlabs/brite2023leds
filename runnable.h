@@ -1,3 +1,6 @@
+#ifndef LEDS_RUNNABLE
+#define LEDS_RUNNABLE
+
 class Runnable {
     static Runnable *headRunnable;
     Runnable *nextRunnable;
@@ -24,3 +27,5 @@ class Runnable {
 };
 
 Runnable *Runnable::headRunnable = NULL;
+
+#endif

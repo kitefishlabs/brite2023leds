@@ -40,9 +40,6 @@ public:
 
   void loop() {
 
-// clear_leds();
-
-// for (int i = 0; i < NUM_LEDS_PER_STRIP; i++) {
 
    if (random(1000) < this->prob) {
      this->currentHue_ = CHSV(this->currentHue_.h + uint8_t(random(12)), this->currentHue_.s + uint8_t(random(32)), this->currentHue_.v + uint8_t(random(5)) );
