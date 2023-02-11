@@ -54,9 +54,9 @@
 // #define LOOP_LEVELS_T 30
 
 
-
-int levels_down[8] = {7, 6, 5, 4, 3, 2, 1};
-int levels_up[8] = {0, 1, 2, 3, 4, 5, 6};
+//
+//int levels_down[8] = {7, 6, 5, 4, 3, 2, 1};
+//int levels_up[8] = {0, 1, 2, 3, 4, 5, 6};
 
 // int levels_vertical_inward[4][2]  = {{0,7}, {1,6}, {2,5}, {3,4}};
 // int levels_vertical_outward[4][2] = {{3,4}, {2,5}, {1,6}, {0,7}};

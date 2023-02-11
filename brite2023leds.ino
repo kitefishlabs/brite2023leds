@@ -8,13 +8,14 @@
  #include <OSCMessage.h>  /// https://github.com/CNMAT/OSC
  #include <OSCBundle.h>  /// https://github.com/CNMAT/OSC
 
-#include "common.h"
 
-#define ETHERNET_ACTIVE
+#include "leds_chasers_test.h"
+
+//#define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = LOOP_LEVELS_SWEEP_UP_INIT; // default = off
+int _mode = TEST_CHASERS; // default = off
 int __mode = _mode;
 
 int __param0 = 100;
@@ -50,7 +51,7 @@ TOP - TBD, likely 3-4 loops around the structure, rough estimates below
 // IPAddress IP_ADDRESS = IPAddress(192,168,0,120); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
 IPAddress IP_ADDRESS = IPAddress(192,168,0,101); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
 
-I2SClocklessLedDriver driver;
+I2SClocklessLedDriver *driver = new I2SClocklessLedDriver();
 
 // PINS
 // 8 total pins in the full setup
@@ -87,7 +88,7 @@ int PW[16] = {47,47,45,43,42,41,38,38, 47,47,45,43,42,41,38,38};
 int H = 14;
 int D[8] = { 8, 9, 9, 8, 8, 9, 8, 8 };
 
-
+LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 
 int sides[2][8][5] = {
   {
@@ -194,9 +195,9 @@ void WiFiEvent(WiFiEvent_t event) {
 void clear_leds(uint16_t rolloff=0) {
 //  Serial.print("R:: "); Serial.println(rolloff);
   for (int i = 0; i < (NUMSTRIPS * NUM_LEDS_PER_STRIP); i++) {
-    driver.setPixel(i, 0, 0, 0);
+    driver->setPixel(i, 0, 0, 0);
   }
-   driver.showPixels();
+   driver->showPixels();
 }
 
 void reset() {
@@ -225,8 +226,8 @@ void setup() {
 #endif
 
  Serial.print("LEDs per strip: "); Serial.println(NUM_LEDS_PER_STRIP);
- driver.initled((uint8_t*)leds,pins,NUMSTRIPS,NUM_LEDS_PER_STRIP,ORDER_GRBW); // (uint8_t*) leds are 4-uint8-wide
- driver.setBrightness(MASTER_BRIGHTNESS);
+ driver->initled((uint8_t*)leds,pins,NUMSTRIPS,NUM_LEDS_PER_STRIP,ORDER_GRBW); // (uint8_t*) leds are 4-uint8-wide
+ driver->setBrightness(MASTER_BRIGHTNESS);
  Serial.print("master brightness: "); Serial.println(MASTER_BRIGHTNESS);
 
  reset();
@@ -279,12 +280,12 @@ void trigger_side() {
     if (d > 0) {  
 //      Serial.print("A: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start); Serial.print(" "); Serial.println(start+(d*l));
       for (int j=start; j<(start+(d*l)); j++) {
-          driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+          driver->setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
       }
     } else {
 //      Serial.print("B: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start+(d*l)); Serial.print(" "); Serial.println(start);
       for (int j=start-1; j>=(start+(d*l)); j--) {
-        driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+        driver->setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
       }
     }
   }
@@ -329,12 +330,12 @@ void trigger_level(int dir) {
     if (d > 0) {  
 //      Serial.print("A: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start); Serial.print(" "); Serial.println(start+(d*l));
       for (int j=start; j<(start+(d*l)); j++) {
-          driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+          driver->setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
       }
     } else {
 //      Serial.print("B: "); Serial.print(temp.r); Serial.print(" ");  Serial.print(temp.g); Serial.print(" ");  Serial.print(temp.b); Serial.print(" ");  Serial.print(start+(d*l)); Serial.print(" "); Serial.println(start);
       for (int j=start-1; j>=(start+(d*l)); j--) {
-        driver.setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
+        driver->setPixel(j, temp.r, temp.g, temp.b); //, MASTER_BRIGHTNESS/4);
       }
     }
   }
@@ -375,7 +376,7 @@ void trigger_level_sweep(int dir) {
       if (d>0) {
       
         int j = start + lvls[ll];
-        driver.setPixel(j, temp.r, temp.g, temp.b);
+        driver->setPixel(j, temp.r, temp.g, temp.b);
         if (j >= start+(d*l)) {
           lvls[ll] = 0;
           Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
@@ -386,7 +387,7 @@ void trigger_level_sweep(int dir) {
       } else {
       
         int j = start - 1 - lvls[ll];
-        driver.setPixel(j, temp.r, temp.g, temp.b);
+        driver->setPixel(j, temp.r, temp.g, temp.b);
         if (j <= (start+(d*l))) {
           lvls[ll] = 0;
           Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
@@ -426,15 +427,16 @@ void loop() {
 //
 //    for (int x=0; x<8; x++) {
 //      trigger_level(x);
-//      driver.showPixels();
+//      driver->showPixels();
 //      delay(500);
 //    }
 
   } else if (_mode == TEST_CHASERS) {
 
-    clear_leds();
-      Serial.println("test_all_with_chasers()");
-    // calls show and delay internally
+//    clear_leds();
+      Serial.println("test_chasers()");
+    chasersTest.update_model();
+    chasersTest.loop();
 
   } else if (_mode == LIGHT_SIDES) {
 
@@ -447,7 +449,7 @@ void loop() {
     if ((millis() % __param0) < 10) {
       clear_leds();
       trigger_side();
-      driver.showPixels();
+      driver->showPixels();
 //      hb_ = hb;
     }
 
@@ -457,7 +459,7 @@ void loop() {
     if ((millis() % __param0) < 10) {
       clear_leds();
       trigger_level(1);
-      driver.showPixels();
+      driver->showPixels();
     }
 
   } else if (_mode == TRIGGER_LEVELS_DOWN) {
@@ -465,7 +467,7 @@ void loop() {
     if ((millis() % __param0) < 10) {
       clear_leds();
       trigger_level(-1);
-      driver.showPixels();
+      driver->showPixels();
     }
 
   } else if (_mode == LOOP_LEVELS_SWEEP_UP_INIT) {
@@ -482,7 +484,7 @@ void loop() {
     if ((millis() % __param0) < 10) {
 //      clear_leds();
       trigger_level_sweep(1);
-      driver.showPixels();
+      driver->showPixels();
     }
 
   } else if (_mode == LOOP_LEVELS_SWEEP_DOWN_INIT) {
@@ -496,39 +498,16 @@ void loop() {
     if ((millis() % __param0) < 10) {
       clear_leds();
       trigger_level_sweep(-1);
-      driver.showPixels();
+      driver->showPixels();
     }
-
 
   } else {
     ;
   }
 
-//  counter++;
-//  time2=ESP.getCycleCount();
-//  driver.showPixels();
-//  time3=ESP.getCycleCount();
-//  Serial.printf("Calcul pixel fps:%.2f   showPixels fps:%.2f   Total fps:%.2f \n",(float)240000000/(time2-time1),(float)240000000/(time3-time2),(float)240000000/(time3-time1));
-//  off++;
-  // delay(2000);
 
-  delay(10);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -624,33 +603,3 @@ G  -  (r,o,l,d)
 30 4 ((PW[8]*2)+D[4]+PW[9])   PW[9] -
 31 4   0            +PW[8]    PW[8] +
 */
-
-
-
-//void test_all_with_chasers() {
-//
-//  clear_leds();
-//
-//  for (int i = 0; i < NUM_LEDS_PER_STRIP; i++) {
-//
-//    if (random(1000) < 200) {
-//      currentHue = CHSV(currentHue.h + uint8_t(random(12)), currentHue.s + uint8_t(random(32)), currentHue.v + uint8_t(random(5)) );
-//      hsv2rgb_rainbow( currentHue, currentRGB);
-//    
-//      Serial.print(currentHue.h); Serial.print(" ");
-//      Serial.print(currentHue.s); Serial.print(" ");
-//      Serial.print(currentHue.v); Serial.print(" ");
-//      Serial.println("");
-//    }
-//    
-//    for (int j = 0; j < NUMSTRIPS; j++) {
-//      driver.setPixel(((j * NUM_LEDS_PER_STRIP) + i) % (NUMSTRIPS * NUM_LEDS_PER_STRIP), currentRGB.r, currentRGB.g, currentRGB.b, MASTER_BRIGHTNESS);
-//      driver.setBrightness(MASTER_BRIGHTNESS);
-//    }
-//    driver.showPixels();
-//    delay(2);
-//    
-//  }
-//  delay(2000);
-//    
-//}
