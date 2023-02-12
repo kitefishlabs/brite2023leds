@@ -104,7 +104,7 @@ public:
     Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
   };
 
-  void loop(int dir) {
+  void light_level() {
 
     Serial.print("lvl: "); Serial.println(this->currentLevel_);
     for (int ll = 0; ll < 8; ll++) {
@@ -142,9 +142,35 @@ public:
         }
       }
     }
+  };
+  
+  void loop() {
+    
+    if (this->subMode_ == 0) {
+    
+      this->currentSide_ = 0;
+      this->light_level();
+    
+    } else if (this->subMode_ == 1) {
+
+      this->currentSide_ = 1;
+      this->light_level();
+    
+    } else if (this->subMode_ == 2) {
+      
+      for (int i=0; i<2; i++) {
+        this->currentSide_ = i;
+        this->light_level();
+      }
+
+    } else if (this->subMode_ == 3) {
+      this->currentSide_ = 1 - this->currentSide_;
+      this->light_level();
+    }
     this->counter_ = (this->counter_ + 1) % 10000;
     this->driver_->showPixels();
   };
+
 };
 
 #endif

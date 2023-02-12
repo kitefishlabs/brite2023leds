@@ -12,16 +12,17 @@
 #include "leds_chasers_test.h"
 #include "leds_light_side.h"
 #include "leds_trigger_level.h"
+#include "leds_trigger_level_fade.h"
 #include "leds_trigger_level_sweep.h"
 
-#define ETHERNET_ACTIVE
+//#define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = LOOP_LEVELS_SWEEP_UP_INIT; // default = off
+int _mode = LOOP_LEVELS_FADE_UP_INIT; // default = off
 int __mode = _mode;
 
-int __param0 = 12;
+int __param0 = 50;
 
 int sd = 0;
 int lvl = 0;
@@ -95,6 +96,7 @@ LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
 LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
 LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
+LEDsTriggerLevelFade triggerLevelFades = LEDsTriggerLevelFade(driver);
 
 // OSC Callback Functions (if necessary)
 
@@ -211,6 +213,7 @@ void setup() {
   lightSides.init();
   triggerLevels.init();
   triggerLevelSweeps.init(1);
+  triggerLevelFades.init(1);
 }
 
 
@@ -272,9 +275,9 @@ void loop() {
  } else if (_mode == LOOP_LEVELS_SWEEP_UP) {
    
    if ((millis() % __param0) < 10) {
-     clear_leds();
+//     clear_leds();
      triggerLevelSweeps.update_model(-1);
-     triggerLevelSweeps.loop(-1);
+     triggerLevelSweeps.loop();
    }
 
  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN_INIT) {
@@ -286,9 +289,39 @@ void loop() {
  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN) {
    
    if ((millis() % __param0) < 10) {
-     clear_leds();
+//     clear_leds();
      triggerLevelSweeps.update_model(1);
-     triggerLevelSweeps.loop(1);
+     triggerLevelSweeps.loop();
+   }
+
+
+} else if (_mode == LOOP_LEVELS_FADE_UP_INIT) {
+
+   Serial.println("LOOP_LEVELS_FADE_UP_INIT");
+   triggerLevelFades.init(-1);
+   
+   __mode = LOOP_LEVELS_FADE_UP;
+
+ } else if (_mode == LOOP_LEVELS_FADE_UP) {
+   
+   if ((millis() % __param0) < 10) {
+//     clear_leds();
+     triggerLevelFades.update_model(-1);
+     triggerLevelFades.loop();
+   }
+
+ } else if (_mode == LOOP_LEVELS_FADE_DOWN_INIT) {
+
+   Serial.println("LOOP_LEVELS_FADE_DOWN_INIT");
+   __mode = LOOP_LEVELS_FADE_DOWN;
+   triggerLevelFades.init(1);
+
+ } else if (_mode == LOOP_LEVELS_FADE_DOWN) {
+   
+   if ((millis() % __param0) < 10) {
+//     clear_leds();
+     triggerLevelFades.update_model(1);
+     triggerLevelFades.loop();
    }
 
   } //else {

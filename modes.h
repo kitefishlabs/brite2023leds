@@ -17,6 +17,11 @@
 #define LOOP_LEVELS_SWEEP_UP                    26
 #define LOOP_LEVELS_SWEEP_UP_INIT              126
 
+#define LOOP_LEVELS_FADE_DOWN                  27
+#define LOOP_LEVELS_FADE_DOWN_INIT            127
+#define LOOP_LEVELS_FADE_UP                    28
+#define LOOP_LEVELS_FADE_UP_INIT              128
+
 
 
 // #define TRIGGER_ALL_LEVELS_RIGHT          22
