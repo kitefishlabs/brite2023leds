@@ -12,15 +12,16 @@
 #include "leds_chasers_test.h"
 #include "leds_light_side.h"
 #include "leds_trigger_level.h"
+#include "leds_trigger_level_sweep.h"
 
 #define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = TRIGGER_LEVELS_UP; // default = off
+int _mode = LOOP_LEVELS_SWEEP_UP_INIT; // default = off
 int __mode = _mode;
 
-int __param0 = 500;
+int __param0 = 12;
 
 int sd = 0;
 int lvl = 0;
@@ -93,7 +94,7 @@ CHSV example_blue = CHSV(0, 120,64);
 LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
 LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
-
+LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
 
 // OSC Callback Functions (if necessary)
 
@@ -139,7 +140,6 @@ void WiFiEvent(WiFiEvent_t event) {
       break;
     default:
       break;
-    
  }
 }
 #endif
@@ -210,6 +210,7 @@ void setup() {
 
   lightSides.init();
   triggerLevels.init();
+  triggerLevelSweeps.init(1);
 }
 
 
@@ -232,8 +233,6 @@ void loop() {
     chasersTest.loop();
 
   } else if (_mode == LIGHT_SIDES) {
-
-//    Serial.println(__param0); 
     
     if ((millis() % __param0) < 10) {
       
@@ -254,144 +253,46 @@ void loop() {
       triggerLevels.loop();
     }
 
-//  } else if (_mode == TRIGGER_LEVELS_DOWN) {
-//    
-//    if ((millis() % __param0) < 10) {
-//      clear_leds();
-//      
-//      triggerLevels.update_model(1);
-//      triggerLevels.loop();
-//    }
+ } else if (_mode == TRIGGER_LEVELS_DOWN) {
+   
+   if ((millis() % __param0) < 10) {
+     clear_leds();
+     
+     triggerLevels.update_model(1);
+     triggerLevels.loop();
+   }
 
-//  } else if (_mode == LOOP_LEVELS_SWEEP_UP_INIT) {
-//
-//    Serial.println("LOOP_LEVELS_SWEEP_UP_INIT");
-////    Serial.println(counter);
-//    sd = 0;
-//    lvl = -1;
-//    __mode = LOOP_LEVELS_SWEEP_UP;
-//
-//  } else if (_mode == LOOP_LEVELS_SWEEP_UP) {
-//    
-//    if ((millis() % __param0) < 10) {
-////      clear_leds();
-//      trigger_level_sweep(1);
-//      driver->showPixels();
-//    }
-//
-//  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN_INIT) {
-//
-//    sd = 0;
-//    lvl = 0;
-//    __mode = LOOP_LEVELS_SWEEP_DOWN;
-//
-//  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN) {
-//    
-//    if ((millis() % __param0) < 10) {
-//      clear_leds();
-//      trigger_level_sweep(-1);
-//      driver->showPixels();
-//    }
+ } else if (_mode == LOOP_LEVELS_SWEEP_UP_INIT) {
 
-  } else {
-    ;
-  }
+   Serial.println("LOOP_LEVELS_SWEEP_UP_INIT");
+   triggerLevelSweeps.init(-1);
+   
+   __mode = LOOP_LEVELS_SWEEP_UP;
 
+ } else if (_mode == LOOP_LEVELS_SWEEP_UP) {
+   
+   if ((millis() % __param0) < 10) {
+     clear_leds();
+     triggerLevelSweeps.update_model(-1);
+     triggerLevelSweeps.loop(-1);
+   }
 
+ } else if (_mode == LOOP_LEVELS_SWEEP_DOWN_INIT) {
+
+   Serial.println("LOOP_LEVELS_SWEEP_DOWN_INIT");
+   __mode = LOOP_LEVELS_SWEEP_DOWN;
+   triggerLevelSweeps.init(1);
+
+ } else if (_mode == LOOP_LEVELS_SWEEP_DOWN) {
+   
+   if ((millis() % __param0) < 10) {
+     clear_leds();
+     triggerLevelSweeps.update_model(1);
+     triggerLevelSweeps.loop(1);
+   }
+
+  } //else {
+//    ;
+//  }
 
 }
-
-
-
-
-
-/*
-
-CALCULATE THE ROLDs for each logical segment
-TODO: RECALCULATE FOR NEW LAYOUT!!!
-S - 
-0 3 ((PW[6]*2) + D[3]) (PW[7]*2) *
-  3  (PW[6]*2)       (PW[6]*2) *
-  2 ((PW[4]*2) + D[2]) (PW[5]*2) *
-  2  (PW[4]*2)       (PW[4]*2) *
-  1 ((PW[2]*2) + D[1]) (PW[3]*2) *
-  1  (PW[2]*2)       (PW[2]*2) *
-  0 ((PW[0]*2) + D[0]) (PW[1]*2) *
-  0  (PW[0]*2)       (PW[0]*2) *
-1 7 ((PW[14]*2)+D[7]+(PW[15]*2)) (PW[15]*2) *
-  7   0                          (PW[14]*2) *
-  6 ((PW[12]*2)+D[6]+(PW[13]*2)) (PW[13]*2) *
-  6   0                          (PW[12]*2) *
-  5 ((PW[10]*2)+D[5]+(PW[11]*2)) (PW[11]*2) *
-  5   0                          (PW[10]*2) *
-  4 ((PW[8]*2)+D[4]+(PW[9]*2))    (PW[9]*2) *
-  4   0                           (PW[8]*2) *
-
-L  -  (r, o, l, d)
-0  3 ((PW[6]*2) + D[3]) (PW[7]*2) +,      7 ((PW[14]*2)+D[7]+(PW[15*2))  (PW[15]*2) -
-1  3  (PW[6]*2)         (PW[6]*2) -,      7   0                          (PW[14]*2) +
-2  2 ((PW[4]*2) + D[2]) (PW[5]*2) +,      6 ((PW[12]*2)+D[6]+(PW[13]*2)) (PW[13]*2) -
-3  2  (PW[4]*2)         (PW[4]*2) -,      6   0                          (PW[12]*2) +
-4  1 ((PW[2]*2) + D[1]) (PW[3]*2) +,      5 ((PW[10]*2)+D[5]+(PW[11]*2)) (PW[11]*2) -
-5  2  (PW[2]*2)         (PW[2]*2) -,      5   0                          (PW[10]*2) +
-6  0 ((PW[0]*2) + D[0]) (PW[1]*2) +,      4 ((PW[8]*2)+D[4]+(PW[9]*2))   (PW[9]*2) -
-7  0  (PW[0]*2)         (PW[0]*2) -,      4   0                          (PW[8]*2) +
-
-
-P  -  (r,o,l,d)
-0  3 ((PW[6]*2) + D[3]) (PW[7]*2) +
-1  3  (PW[6]*2)         (PW[6]*2) -
-2  2 ((PW[4]*2) + D[2]) (PW[5]*2) +
-3  2  (PW[4]*2)         (PW[4]*2) -
-4  1 ((PW[2]*2) + D[1]) (PW[3]*2) +
-5  2  (PW[2]*2)         (PW[2]*2) -
-6  0 ((PW[0]*2) + D[0]) (PW[1]*2) +
-7  0  (PW[0]*2)         (PW[0]*2) -
-
-8  7 ((PW[14]*2)+D[7]+(PW[15]*2)) (PW[15]*2) -
-9  7   0                          (PW[14]*2) +
-10 6 ((PW[12]*2)+D[6]+(PW[13]*2)) (PW[13]*2) -
-11 6   0                          (PW[12]*2) +
-12 5 ((PW[10]*2)+D[5]+(PW[11]*2)) (PW[11]*2) -
-13 5   0                          (PW[10]*2) +
-14 4 ((PW[8]*2)+D[4]+(PW[9]*2))   (PW[9]*2) -
-15 4   0                          (PW[8]*2) +
-
-
-G  -  (r,o,l,d)
-0  3 ((PW[6]*2) + D[3]) PW[7] +
-1  3  (PW[6]*2)         PW[6] -
-2  2 ((PW[4]*2) + D[2]) PW[5] +
-3  2  (PW[4]*2)         PW[4] -
-4  1 ((PW[2]*2) + D[1]) PW[3] +
-5  2  (PW[2]*2)         PW[2] -
-6  0 ((PW[0]*2) + D[0]) PW[1] +
-7  0  (PW[0]*2)         PW[0] -
-
- 8  3 ((PW[6]*2) + D[3] + PW[7])  PW[7] +
- 9  3  (PW[6]*2)      -   PW[6])  PW[6] -
-10  2 ((PW[4]*2) + D[2] + PW[5])  PW[5] +
-11  2  (PW[4]*2)      -   PW[4])  PW[4] -
-12  1 ((PW[2]*2) + D[1] + PW[3])  PW[3] +
-13  2  (PW[2]*2)      -   PW[2])  PW[2] -
-14  0 ((PW[0]*2) + D[0] + PW[1])  PW[1] +
-15  0  (PW[0]*2)      -   PW[0])  PW[0] -
-
-16 7 ((PW[14]*2)+D[7]+(PW[15]*2)) PW[15] -
-17 7   0                          PW[14] +
-18 6 ((PW[12]*2)+D[6]+(PW[13]*2)) PW[13] -
-19 6   0                          PW[12] +
-20 5 ((PW[10]*2)+D[5]+(PW[11]*2)) PW[11] -
-21 5   0                          PW[10] +
-22 4 ((PW[8]*2)+D[4]+(PW[9]*2))   PW[9] -
-23 4   0                          PW[8] +
-
-24 7 ((PW[14]*2)+D[7]+PW[15]) PW[15] -
-25 7   0             +PW[14]  PW[14] +
-26 6 ((PW[12]*2)+D[6]+PW[13]) PW[13] -
-27 6   0             +PW[12]  PW[12] +
-28 5 ((PW[10]*2)+D[5]+PW[11]) PW[11] -
-29 5   0             +PW[10]  PW[10] +
-30 4 ((PW[8]*2)+D[4]+PW[9])   PW[9] -
-31 4   0            +PW[8]    PW[8] +
-*/
