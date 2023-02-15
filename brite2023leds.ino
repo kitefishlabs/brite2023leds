@@ -14,16 +14,17 @@
 #include "leds_light_side.h"
 #include "leds_trigger_level.h"
 #include "leds_trigger_level_fade.h"
+#include "leds_spiral_level_sweep.h"
 #include "leds_trigger_level_sweep.h"
 
 #define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = TWINKLE_STARS; // default = off
+int _mode = SPIRAL_LEVELS_SWEEP_UP_INIT; // default = off
 int __mode = _mode;
 
-int __param0 = 25;
+int __param0 = 5;
 
 int sd = 0;
 int lvl = 0;
@@ -88,10 +89,11 @@ CHSV example_blue = CHSV(0, 120,64);
 
 LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
+LEDsTwinkleStars twinkleStars = LEDsTwinkleStars(driver, leds_state, leds_speed_state);
 LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
+LEDsSpiralLevelSweep spiralLevelSweeps = LEDsSpiralLevelSweep(driver);
 LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
 LEDsTriggerLevelFade triggerLevelFades = LEDsTriggerLevelFade(driver);
-LEDsTwinkleStars twinkleStars = LEDsTwinkleStars(driver, leds_state, leds_speed_state);
 
 // OSC Callback Functions (if necessary)
 
@@ -212,6 +214,7 @@ void setup() {
   lightSides.init();
   triggerLevels.init();
   triggerLevelSweeps.init(1);
+  spiralLevelSweeps.init(1);
   triggerLevelFades.init(1);
   twinkleStars.init();
 }
@@ -279,7 +282,7 @@ void loop() {
  } else if (_mode == LOOP_LEVELS_SWEEP_UP_INIT) {
 
    Serial.println("LOOP_LEVELS_SWEEP_UP_INIT");
-   triggerLevelSweeps.init(-1);
+   triggerLevelSweeps.init(1);
    
    __mode = LOOP_LEVELS_SWEEP_UP;
 
@@ -287,7 +290,7 @@ void loop() {
    
    if ((millis() % __param0) < 10) {
 //     clear_leds();
-     triggerLevelSweeps.update_model(-1);
+     triggerLevelSweeps.update_model(1);
      triggerLevelSweeps.loop();
    }
 
@@ -295,21 +298,52 @@ void loop() {
 
    Serial.println("LOOP_LEVELS_SWEEP_DOWN_INIT");
    __mode = LOOP_LEVELS_SWEEP_DOWN;
-   triggerLevelSweeps.init(1);
+   triggerLevelSweeps.init(-1);
 
  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN) {
    
    if ((millis() % __param0) < 10) {
 //     clear_leds();
-     triggerLevelSweeps.update_model(1);
+     triggerLevelSweeps.update_model(-1);
      triggerLevelSweeps.loop();
+   }
+
+
+
+} else if (_mode == SPIRAL_LEVELS_SWEEP_UP_INIT) {
+
+   Serial.println("SPIRAL_LEVELS_SWEEP_UP_INIT");
+   spiralLevelSweeps.init(1);
+   
+   __mode = SPIRAL_LEVELS_SWEEP_UP;
+
+ } else if (_mode == SPIRAL_LEVELS_SWEEP_UP) {
+   
+   if ((millis() % __param0) < 10) {
+//     clear_leds();
+     spiralLevelSweeps.update_model(1);
+     spiralLevelSweeps.loop();
+   }
+
+ } else if (_mode == SPIRAL_LEVELS_SWEEP_DOWN_INIT) {
+
+   Serial.println("SPIRAL_LEVELS_SWEEP_DOWN_INIT");
+   __mode = SPIRAL_LEVELS_SWEEP_DOWN;
+   spiralLevelSweeps.init(-1);
+
+ } else if (_mode == SPIRAL_LEVELS_SWEEP_DOWN) {
+   
+   if ((millis() % __param0) < 10) {
+//     clear_leds();
+     spiralLevelSweeps.update_model(-1);
+     spiralLevelSweeps.loop();
    }
 
 
   } else if (_mode == LOOP_LEVELS_FADE_UP_INIT) {
 
    Serial.println("LOOP_LEVELS_FADE_UP_INIT");
-   triggerLevelFades.init(-1);
+   triggerLevelFades.init(1);
    
    __mode = LOOP_LEVELS_FADE_UP;
 
@@ -317,7 +351,7 @@ void loop() {
    
    if ((millis() % __param0) < 10) {
 //     clear_leds();
-     triggerLevelFades.update_model(-1);
+     triggerLevelFades.update_model(1);
      triggerLevelFades.loop();
    }
 
@@ -325,13 +359,13 @@ void loop() {
 
    Serial.println("LOOP_LEVELS_FADE_DOWN_INIT");
    __mode = LOOP_LEVELS_FADE_DOWN;
-   triggerLevelFades.init(1);
+   triggerLevelFades.init(-1);
 
  } else if (_mode == LOOP_LEVELS_FADE_DOWN) {
    
    if ((millis() % __param0) < 10) {
 //     clear_leds();
-     triggerLevelFades.update_model(1);
+     triggerLevelFades.update_model(-1);
      triggerLevelFades.loop();
    }
 

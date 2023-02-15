@@ -22,7 +22,7 @@ private:
   int counter_;
   uint8_t subMode_;
   int offset_;
-  int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+  int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
   LEDsTriggerLevelFade(I2SClocklessLedDriver *driver) {

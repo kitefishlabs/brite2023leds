@@ -1,5 +1,5 @@
-#ifndef LEDS_TRIGGER_LEVEL_SWEEP
-#define LEDS_TRIGGER_LEVEL_SWEEP
+#ifndef LEDS_SPIRAL_LEVEL_SWEEP
+#define LEDS_SPIRAL_LEVEL_SWEEP
 #include <FastLED.h>
 #include "I2SClocklessLedDriver.h"
 
@@ -9,7 +9,7 @@
 #include "modes.h"
 
 
-class LEDsTriggerLevelSweep {
+class LEDsSpiralLevelSweep {
 
 private:
   I2SClocklessLedDriver* driver_;
@@ -24,7 +24,7 @@ private:
   int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
-  LEDsTriggerLevelSweep(I2SClocklessLedDriver *driver) {
+  LEDsSpiralLevelSweep(I2SClocklessLedDriver *driver) {
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);
     currentRGB_ = CRGB(0,0,0);
@@ -81,19 +81,20 @@ public:
 //      Serial.println(this->lvls_[i]);
 //    }
 
-    if (((this->counter_ % this->offset_) == 0) && (this->lvls_[this->currentLevel_] == 0)) {
-      
-      Serial.print("LVL: ");  Serial.println(this->currentLevel_);
-//      if (this->currentLevel_ == 0) {
-//        this->currentSide_ = 1 - this->currentSide_;
-//        Serial.print("lvl == 0 detected sd="); Serial.println(this->currentSide_);
-//      }
-      this->lvls_[this->currentLevel_] = 1;
-      if ((this->currentLevel_ + dir) < 0) {
-        this->currentLevel_ = 10;
-      } else {
-        this->currentLevel_ = (this->currentLevel_ + dir) % NUM_LEVELS;
+    if (this->counter_ >= PW[((this->currentSide_ * NUM_LEVELS) + this->currentLevel_)]*2) {
+
+      this->lvls_[this->currentLevel_] = 0;
+      this->counter_ = 0;
+
+      this->currentSide_ = 1 - this->currentSide_;
+      if (this->currentSide_ == 0) {
+        this->currentLevel_ = (this->currentLevel_ + dir + NUM_LEVELS) % NUM_LEVELS;
       }
+      this->lvls_[this->currentLevel_] = 1;
+    
+    } else {
+      this->counter_ += 1;
+      this->lvls_[this->currentLevel_] += 1;
     }
     
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
@@ -122,23 +123,23 @@ public:
         
           int j = start + this->lvls_[ll];
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
-          if (j >= start+(d*l)) {
-            this->lvls_[ll] = 0;
-            Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
-          } else {
-            this->lvls_[ll] = (this->lvls_[ll] + 1);
-          }
+//          if (j >= start+(d*l)) {
+//            this->lvls_[ll] = 0;
+//            Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
+//          } else {
+//            this->lvls_[ll] = (this->lvls_[ll] + 1);
+//          }
         
         } else {
         
           int j = start - 1 - this->lvls_[ll];
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
-          if (j <= (start+(d*l))) {
-            this->lvls_[ll] = 0;
-            Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
-          } else {
-            this->lvls_[ll] = (this->lvls_[ll] + 1);
-          }
+//          if (j <= (start+(d*l))) {
+//            this->lvls_[ll] = 0;
+//            Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
+//          } else {
+//            this->lvls_[ll] = (this->lvls_[ll] + 1);
+//          }
         }
       }
     }
@@ -164,10 +165,10 @@ public:
       }
 
     } else if (this->subMode_ == 3) {
-      this->currentSide_ = 1 - this->currentSide_;
+//      this->currentSide_ = 1 - this->currentSide_;
       this->light_level();
     }
-    this->counter_ = (this->counter_ + 1) % 10000;
+//    this->counter_ = (this->counter_ + 1) % 10000;
     this->driver_->showPixels();
   };
 

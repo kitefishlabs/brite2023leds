@@ -17,16 +17,21 @@
 
 
 
-#define LOOP_LEVELS_SWEEP_DOWN            25
-#define LOOP_LEVELS_SWEEP_DOWN_INIT      125
-#define LOOP_LEVELS_SWEEP_UP              26
-#define LOOP_LEVELS_SWEEP_UP_INIT        126
+#define LOOP_LEVELS_SWEEP_DOWN            30
+#define LOOP_LEVELS_SWEEP_DOWN_INIT      130
+#define LOOP_LEVELS_SWEEP_UP              31
+#define LOOP_LEVELS_SWEEP_UP_INIT        131
 
-#define LOOP_LEVELS_FADE_DOWN             27
-#define LOOP_LEVELS_FADE_DOWN_INIT       127
-#define LOOP_LEVELS_FADE_UP               28
-#define LOOP_LEVELS_FADE_UP_INIT         128
+#define LOOP_LEVELS_FADE_DOWN             32
+#define LOOP_LEVELS_FADE_DOWN_INIT       132
+#define LOOP_LEVELS_FADE_UP               33
+#define LOOP_LEVELS_FADE_UP_INIT         133
 
+
+#define SPIRAL_LEVELS_SWEEP_DOWN          34
+#define SPIRAL_LEVELS_SWEEP_DOWN_INIT    134
+#define SPIRAL_LEVELS_SWEEP_UP            35
+#define SPIRAL_LEVELS_SWEEP_UP_INIT      135
 
 
 
