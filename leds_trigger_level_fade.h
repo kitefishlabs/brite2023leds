@@ -22,7 +22,7 @@ private:
   int counter_;
   uint8_t subMode_;
   int offset_;
-  int lvls_[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+  int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
   LEDsTriggerLevelFade(I2SClocklessLedDriver *driver) {
@@ -36,7 +36,7 @@ public:
     counter_ = 0;
     subMode_ = 2;
     offset_ = 40;
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<NUM_LEVELS; i++) {
       lvls_[i] = 0;
     }
   };
@@ -51,16 +51,16 @@ public:
     }
     
     this->currentSide_ = 0;
-    this->pulse_speed_ = 12;
+    this->pulse_speed_ = 3;
     this->speed__ = 1;
     this->counter_ = 0;
     this->subMode_ = 2;
     this->offset_ = 25;
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<NUM_LEVELS; i++) {
       this->lvls_[i] = 0;
     }
     Serial.println("INIT");
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<NUM_LEVELS; i++) {
       Serial.println(this->lvls_[i]);
     }
   }
@@ -78,8 +78,8 @@ public:
         
 //    Serial.print("counter: "); Serial.println(this->counter_);
 //    Serial.print("cur lvl: "); Serial.println(this->currentLevel_);
-//    Serial.print("lvl val: "); Serial.println(this->lvls_[((this->currentLevel_+dir)%8)]);
-//    for (int i=0; i<8; i++) {
+//    Serial.print("lvl val: "); Serial.println(this->lvls_[((this->currentLevel_+dir)%NUM_LEVELS)]);
+//    for (int i=0; i<NUM_LEVELS; i++) {
 //      Serial.println(this->lvls_[i]);
 //    }
 
@@ -94,7 +94,7 @@ public:
       if ((this->currentLevel_ + dir) < 0) {
         this->currentLevel_ = 7;
       } else {
-        this->currentLevel_ = (this->currentLevel_ + dir) % 8;
+        this->currentLevel_ = (this->currentLevel_ + dir) % NUM_LEVELS;
       }
     }
     
@@ -119,7 +119,7 @@ public:
   void light_level() {
 
 //    Serial.print("lvl: "); Serial.println(this->currentLevel_);
-    for (int ll = 0; ll < 8; ll++) {
+    for (int ll = 0; ll < NUM_LEVELS; ll++) {
 //      Serial.print("LL: "); Serial.print(ll);  Serial.print(" "); 
       if (this->lvls_[ll] > 0) {
         
@@ -128,7 +128,7 @@ public:
         int l = LEVELS[ll][this->currentSide_][2];
         int d = LEVELS[ll][this->currentSide_][3];
         int lt = LEVELS[ll][this->currentSide_][4];
-        int start = (r * 200) + o;
+        int start = (r * 400) + o;
 
         uint8_t v_ = attackDecayWave8(MIN(this->lvls_[ll], 256));
 

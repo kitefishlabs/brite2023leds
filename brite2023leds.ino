@@ -10,19 +10,20 @@
 
 
 #include "leds_chasers_test.h"
+#include "leds_twinkle_stars.h"
 #include "leds_light_side.h"
 #include "leds_trigger_level.h"
 #include "leds_trigger_level_fade.h"
 #include "leds_trigger_level_sweep.h"
 
-//#define ETHERNET_ACTIVE
+#define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = LOOP_LEVELS_FADE_UP_INIT; // default = off
+int _mode = TWINKLE_STARS; // default = off
 int __mode = _mode;
 
-int __param0 = 50;
+int __param0 = 25;
 
 int sd = 0;
 int lvl = 0;
@@ -53,21 +54,23 @@ TOP - TBD, likely 3-4 loops around the structure, rough estimates below
 */
 
 // IPAddress IP_ADDRESS = IPAddress(192,168,0,120); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
-IPAddress IP_ADDRESS = IPAddress(192,168,0,101); // client IP address (ie the ESP32) - INGENUITY - SKIDMARK
+IPAddress IP_ADDRESS = IPAddress(192,168,0,101); // client IP address (ie the ESP32) - INGENUITY
 
 I2SClocklessLedDriver *driver = new I2SClocklessLedDriver();
 
 // PINS
 // 8 total pins in the full setup
-int pins[NUMSTRIPS]={4,2, 13,12, 15,14, 33,32};
+//int pins[NUMSTRIPS]={4,2, 13,12, 15,14, 33,32};
+int pins[NUMSTRIPS]={2,12,14,32, 4,13,15};
 
 // LEDs and states
 CRGBW leds[NUM_COLOR_CHANNELS*TOTAL_LEDS];
 
-CHSV states_colors[LIGHTABLE_LEDS];
+uint8_t leds_state[TOTAL_LEDS];
+uint8_t leds_speed_state[TOTAL_LEDS];
 
 // mark leds when they change (certain modes)
-bool states_dirty__flag[LIGHTABLE_LEDS];
+//bool states_dirty__flag[LIGHTABLE_LEDS];
 
 int counter = 0;
 
@@ -80,23 +83,15 @@ CHSV default_color = CHSV(0, 255, 128);
 
 CHSV currentHue = CHSV(0,0,0);
 CRGB currentRGB = CRGB::Black;
-
 CHSV example_blue = CHSV(0, 120,64);
 
-// 190 = 44 + 44 + 46 + 46 + 10   PW N = Width of PANEL at LEVEL N
-// 200 = 47 + 47 + 48 + 48 + 10
-// 212 = 50 + 50 + 51 + 51 + 10
-// 222 = 52 + 52 + 54 + 54 + 10
-
-//int PW[16] = {47,47,45,43,42,41,38,38, 47,47,45,43,42,41,38,38};
-//int H = 14;
-//int D[8] = { 8, 9, 9, 8, 8, 9, 8, 8 };
 
 LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
 LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
 LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
 LEDsTriggerLevelFade triggerLevelFades = LEDsTriggerLevelFade(driver);
+LEDsTwinkleStars twinkleStars = LEDsTwinkleStars(driver, leds_state, leds_speed_state);
 
 // OSC Callback Functions (if necessary)
 
@@ -209,11 +204,16 @@ void setup() {
    Serial.println("END SETUP");
    counter = 0;
 
+  for (int i=0; i< TOTAL_LEDS; i++) {
+    leds_state[i] = 0;
+    leds_speed_state[i] = 0;
+  }
 
   lightSides.init();
   triggerLevels.init();
   triggerLevelSweeps.init(1);
   triggerLevelFades.init(1);
+  twinkleStars.init();
 }
 
 
@@ -243,6 +243,17 @@ void loop() {
       
       lightSides.update_model();
       lightSides.loop();
+      
+    }
+
+  } else if (_mode == TWINKLE_STARS) {
+    
+    if ((millis() % __param0) < 10) {
+      
+//      clear_leds();
+      
+      twinkleStars.update_model();
+      twinkleStars.loop();
       
     }
 
@@ -295,7 +306,7 @@ void loop() {
    }
 
 
-} else if (_mode == LOOP_LEVELS_FADE_UP_INIT) {
+  } else if (_mode == LOOP_LEVELS_FADE_UP_INIT) {
 
    Serial.println("LOOP_LEVELS_FADE_UP_INIT");
    triggerLevelFades.init(-1);
@@ -324,8 +335,6 @@ void loop() {
      triggerLevelFades.loop();
    }
 
-  } //else {
-//    ;
-//  }
+  }
 
 }

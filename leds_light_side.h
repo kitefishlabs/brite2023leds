@@ -19,7 +19,7 @@ private:
   int currentSide_;                 // track which side we are on
 
 public:
-  LEDsLightSide(I2SClocklessLedDriver *driver) {      // int sides[2][8][5]
+  LEDsLightSide(I2SClocklessLedDriver *driver) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
     // currentHSV_ = CHSV(0,0,0);
     // currentRGB_ = CRGB(0,0,0);
@@ -65,7 +65,7 @@ public:
       int d = SIDES[this->currentSide_][i][3];
       int lt = SIDES[this->currentSide_][i][4];
       
-      int start = (r * 200) + o;
+      int start = (r * NUM_LEDS_PER_STRIP) + o;
       
       if (d > 0) {
 

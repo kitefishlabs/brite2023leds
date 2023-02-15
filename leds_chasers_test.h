@@ -17,6 +17,7 @@ private:
   CRGB currentRGB_;
   int index;
   int prob;
+  int strip;
 
 public:
   LEDsChasersTest(I2SClocklessLedDriver *driver) {
@@ -25,6 +26,7 @@ public:
     // currentRGB_ = CRGB(0,0,0);
     index = 0;
     prob = 200;
+    strip = 0;
   };
 
   void setup() {
@@ -32,10 +34,14 @@ public:
     // this->currentRGB_ = CRGB(0,0,0);
     this->index = 0;
     this->prob = 200;
+    this->strip = 0;
   }
 
   void update_model() {
     this->index = (this->index + 1) % NUM_LEDS_PER_STRIP;
+    if (this->index >= NUM_LEDS_PER_STRIP-1) {
+      this->strip = (this->strip + 1) % 8;
+    }
   }
 
   void loop() {
@@ -51,10 +57,10 @@ public:
      Serial.println("");
    }
    
-   for (int j = 0; j < NUMSTRIPS; j++) {
-     driver_->setPixel(((j * NUM_LEDS_PER_STRIP) + this->index) % (NUMSTRIPS * NUM_LEDS_PER_STRIP), this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b, MASTER_BRIGHTNESS);
+//   for (int j = 0; j < NUMSTRIPS; j++) {
+     driver_->setPixel(((this->strip * NUM_LEDS_PER_STRIP) + this->index) % (NUMSTRIPS * NUM_LEDS_PER_STRIP), this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b, MASTER_BRIGHTNESS);
      driver_->setBrightness(MASTER_BRIGHTNESS);
-   }
+//   }
    driver_->showPixels(); 
  }
 };

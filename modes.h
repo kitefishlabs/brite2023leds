@@ -4,35 +4,31 @@
 #define DARK                               0
 #define TEST_CHASERS                       1
 
+#define ALTERNATE_SIDES_PERIOD_MS             2000
 #define LIGHT_SIDES                       10
-#define ALTERNATE_SIDES_PERIOD_MS         2000
+#define TWINKLE_STARS                     11
 
-//#define FADE_SIDES                        11
+
+
 
 #define TRIGGER_LEVELS_DOWN               20
 #define TRIGGER_LEVELS_UP                 21
 
-#define LOOP_LEVELS_SWEEP_DOWN                  25
-#define LOOP_LEVELS_SWEEP_DOWN_INIT            125
-#define LOOP_LEVELS_SWEEP_UP                    26
-#define LOOP_LEVELS_SWEEP_UP_INIT              126
-
-#define LOOP_LEVELS_FADE_DOWN                  27
-#define LOOP_LEVELS_FADE_DOWN_INIT            127
-#define LOOP_LEVELS_FADE_UP                    28
-#define LOOP_LEVELS_FADE_UP_INIT              128
 
 
 
-// #define TRIGGER_ALL_LEVELS_RIGHT          22
-// #define TRIGGER_ALL_LEVELS_LEFT           23
-// #define LOOP_ALL_LEVELS_RIGHT             26
-// #define LOOP_ALL_LEVELS_LEFT              27
+#define LOOP_LEVELS_SWEEP_DOWN            25
+#define LOOP_LEVELS_SWEEP_DOWN_INIT      125
+#define LOOP_LEVELS_SWEEP_UP              26
+#define LOOP_LEVELS_SWEEP_UP_INIT        126
 
-// #define TRIGGER_LEVELS_VERTICAL_IN        30
-// #define TRIGGER_LEVELS_VERTICAL_OUT       31
-// #define TRIGGER_LEVELS_HORIZONTAL_IN      32
-// #define TRIGGER_LEVELS_HORIZONTAL_OUT     33
+#define LOOP_LEVELS_FADE_DOWN             27
+#define LOOP_LEVELS_FADE_DOWN_INIT       127
+#define LOOP_LEVELS_FADE_UP               28
+#define LOOP_LEVELS_FADE_UP_INIT         128
+
+
+
 
 // #define TRIGGER_PANELS_SPIRAL_IN          40
 // #define TRIGGER_PANELS_SPIRAL_OUT         41

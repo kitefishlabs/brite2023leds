@@ -48,7 +48,7 @@ public:
     // update model is called at the start of each main loop func call
     // calling rgb func here should cause rainbowish randomish effect
     // call it at the change of the side var to update color in sync with side changes
-    this->currentLevel_  = (this->currentLevel_ + dir) % 8;
+    this->currentLevel_  = (this->currentLevel_ + dir) % NUM_LEVELS;
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
      Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
@@ -67,7 +67,7 @@ public:
     int d = LEVELS[this->currentLevel_][this->currentSide_][3];
     int lt = LEVELS[this->currentLevel_][this->currentSide_][4];
     
-    int start = (r * 200) + o;
+    int start = (r * NUM_LEDS_PER_STRIP) + o;
 
     Serial.print(r); Serial.print(" ");
     Serial.print(o); Serial.print(" ");

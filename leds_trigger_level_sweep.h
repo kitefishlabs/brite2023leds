@@ -21,7 +21,7 @@ private:
   int counter_;
   uint8_t subMode_;
   int offset_;
-  int lvls_[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+  int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
   LEDsTriggerLevelSweep(I2SClocklessLedDriver *driver) {
@@ -34,9 +34,9 @@ public:
     counter_ = 0;
     subMode_ = 2;
     offset_ = 40;
-    for (int i=0; i<8; i++) {
-      lvls_[i] = 0;
-    }
+//    for (int i=0; i<NUM_LEVELS; i++) {
+//      lvls_[i] = 0;
+//    }
   };
 
   void init(int dir) {
@@ -54,11 +54,11 @@ public:
     this->counter_ = 0;
     this->subMode_ = 2;
     this->offset_ = 40;
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<NUM_LEVELS; i++) {
       this->lvls_[i] = 0;
     }
     Serial.println("INIT");
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<NUM_LEVELS; i++) {
       Serial.println(this->lvls_[i]);
     }
   }
@@ -76,8 +76,8 @@ public:
     
     Serial.print("counter: "); Serial.println(this->counter_);
     Serial.print("cur lvl: "); Serial.println(this->currentLevel_);
-    Serial.print("lvl val: "); Serial.println(this->lvls_[((this->currentLevel_+dir)%8)]);
-    for (int i=0; i<8; i++) {
+    Serial.print("lvl val: "); Serial.println(this->lvls_[((this->currentLevel_+dir)%NUM_LEVELS)]);
+    for (int i=0; i<NUM_LEVELS; i++) {
       Serial.println(this->lvls_[i]);
     }
 
@@ -92,7 +92,7 @@ public:
       if ((this->currentLevel_ + dir) < 0) {
         this->currentLevel_ = 7;
       } else {
-        this->currentLevel_ = (this->currentLevel_ + dir) % 8;
+        this->currentLevel_ = (this->currentLevel_ + dir) % NUM_LEVELS;
       }
     }
     
@@ -107,7 +107,7 @@ public:
   void light_level() {
 
     Serial.print("lvl: "); Serial.println(this->currentLevel_);
-    for (int ll = 0; ll < 8; ll++) {
+    for (int ll = 0; ll < NUM_LEVELS; ll++) {
       Serial.print("LL: "); Serial.println(ll);  
       if (this->lvls_[ll] > 0) {
         
@@ -116,7 +116,7 @@ public:
         int l = LEVELS[ll][this->currentSide_][2];
         int d = LEVELS[ll][this->currentSide_][3];
         int lt = LEVELS[ll][this->currentSide_][4];
-        int start = (r * 200) + o;
+        int start = (r * 400) + o;
         
         if (d>0) {
         
@@ -184,9 +184,9 @@ public:
 // ////  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
 // //
 // ////  every tenth tick, look ahead to see if next level is zeroed out (if not zeroed out, we wait)
-// //  Serial.print("counter = "); Serial.print(counter); Serial.print(" "); Serial.println(((lvl+1)%8));
-// //  if (((counter % 10) == 0) && (lvls[((lvl+1)%8)] == 0)) {
-// //    lvl = (lvl + dir) % 8;
+// //  Serial.print("counter = "); Serial.print(counter); Serial.print(" "); Serial.println(((lvl+1)%NUM_LEVELS));
+// //  if (((counter % 10) == 0) && (lvls[((lvl+1)%NUM_LEVELS)] == 0)) {
+// //    lvl = (lvl + dir) % NUM_LEVELS;
 // //    if (lvl == 0) {
 // //      sd = 1 - sd;
 // //      Serial.print("lvl == 0 detected sd="); Serial.println(sd);
@@ -195,7 +195,7 @@ public:
 // //    lvls[lvl] = 1;
 // //  }
 // //  Serial.print("lvl: ");  Serial.println(lvl);
-// //  for (int ll = 0; ll < 8; ll++) {
+// //  for (int ll = 0; ll < NUM_LEVELS; ll++) {
 // //    Serial.println(ll);  
 // //    if (lvls[ll] >= 0) {
 // //      
@@ -204,7 +204,7 @@ public:
 // //      int l = sides[sd][ll][2];
 // //      int d = sides[sd][ll][3];
 // //      int lt = sides[sd][ll][4];
-// //      int start = (r * 200) + o;
+// //      int start = (r * 400) + o;
 // //      
 // //      if (d>0) {
 // //      
