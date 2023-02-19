@@ -34,9 +34,6 @@ public:
     counter_ = 0;
     subMode_ = 3;
     offset_ = 40;
-//    for (int i=0; i<NUM_LEVELS; i++) {
-//      lvls_[i] = 0;
-//    }
   };
 
   void init(int dir) {
@@ -44,9 +41,9 @@ public:
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     
     if (dir > 0) {
-      this->currentLevel_ = 0;  
+      this->currentLevel_ = 0;
     } else {
-      this->currentLevel_ = 0;  
+      this->currentLevel_ = 0;
     }
     
     this->currentSide_ = 0;
@@ -81,7 +78,7 @@ public:
 //      Serial.println(this->lvls_[i]);
 //    }
 
-    if (this->counter_ >= PW[((this->currentSide_ * NUM_LEVELS) + this->currentLevel_)]*2) {
+    if (this->counter_ >= PW[((this->currentSide_ * NUM_LEVELS) + this->currentLevel_)]) {
 
       this->lvls_[this->currentLevel_] = 0;
       this->counter_ = 0;
@@ -94,7 +91,9 @@ public:
     
     } else {
       this->counter_ += 1;
-      this->lvls_[this->currentLevel_] += 1;
+      if ((this->subMode_ == 2) && (this->currentSide_ == 1)) {
+        this->lvls_[this->currentLevel_] += 1;
+      }
     }
     
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));

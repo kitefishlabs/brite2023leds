@@ -28,8 +28,8 @@
 
 #define NUM_COLOR_CHANNELS 4  // RGBW
 
-#define NUMSTRIPS 7 // 2 + 1 + 2, 2X
-#define NUM_LEVELS 11 // 2 + 1 + 2, 2X
+#define NUMSTRIPS 7
+#define NUM_LEVELS 11
 
 #define NUM_LEDS_PER_STRIP 400
 // #define NUM_LEDS_PER_DOUBLE_STRIP 390
@@ -143,9 +143,10 @@ void clear_hues(CHSV currentHues[], int num_hues, uint8_t hue=0, uint8_t sat=255
 
 
 
-int PW[22] = {47,47,45,43,42,41,38,38, 36,35,34, 47,47,45,43,42,41,38,38, 36,35,34};
+int PW[22] = {47,47,45,43,42,41,38,38, 100,98,96, 47,47,45,43,42,41,38,38, 100,98,96};
 int H = 14;
 int D[8] = { 8, 9, 9, 8, 8, 9, 8, 8 };
+
 
 
 int SIDES[2][NUM_LEVELS][5] = {
@@ -160,14 +161,7 @@ int SIDES[2][NUM_LEVELS][5] = {
     {4, 0, 75, 1, 1},
     {5, 0, 75, 1, 1},
     {6, 0, 75, 1, 1}
-    
-//    {3,  (H + (PW[7]*2)),          D[3], 1, 0},     // goal is to never use these, perhaps only use for testing
-//    {2,  (H + (PW[5]*2)),          D[2], 1, 0},
-//    {1,  (H + (PW[3]*2)),          D[1], 1, 0},
-//    {0,  (H + (PW[1]*2)),          D[0], 1, 0}
   },
-
-
   { 
     {2, (0 + (PW[11+3]*2)+D[5]+(PW[10+3]*2) + (PW[9+3]*2)+D[4]+(PW[8+3]*2)),    (PW[8+3]*2),  -1, 1},
     {2, (0 + (PW[11+3]*2)+D[5]+(PW[10+3]*2)),                                   (PW[9+3]*2),   1, 1},
@@ -180,11 +174,6 @@ int SIDES[2][NUM_LEVELS][5] = {
     {4, 75, 75, -1, 1},
     {5, 75, 75, -1, 1},
     {6, 75, 75, -1, 1}
-    
-//    {7,  (H + (PW[15]*2)),                D[7],       0, 0},
-//    {6,  (H + (PW[13]*2)),                D[6],       0, 0},
-//    {5,  (H + (PW[11]*2)),                D[5],       0, 0},
-//    {4,  (H + (PW[9]*2)),                 D[4],       0, 0}    
   }
 };
 
@@ -205,61 +194,103 @@ int LEVELS[11][2][5] = {
 };
 
 
+int LEVELMAP[NUM_LEVELS][2][8] = {
+  //  strip-idx  start-degrees  end-degrees #leds1 actual-led-idx.                                       length      direction on/off
+    { { 0,       205,           335,        47,     ((PW[3]*2) + D[1] + (PW[2]*2) + (PW[1]*2) + D[0]),   (PW[0]*2),  1, 1},
+      { 2,        25,           115,        47, (0 + (PW[11+3]*2)+D[5]+(PW[10+3]*2) + (PW[9+3]*2)+D[4]+(PW[8+3]*2)),    (PW[8+3]*2),  -1, 1}},
+    { { 0,       205,           335,        47,     ((PW[3]*2) + D[1] + (PW[2]*2) + (PW[1]*2)),          (PW[1]*2), -1, 1},
+      { 2,        25,           115,        47, (0 + (PW[11+3]*2)+D[5]+(PW[10+3]*2)),                                   (PW[9+3]*2),   1, 1}},
+    { { 0,       205,           335,        45,     ((PW[3]*2) + D[1]),                                  (PW[2]*2),  1, 1},
+      { 2,        25,           115,        45, (0 + (PW[11+3]*2)+D[5]+(PW[10+3]*2)),                                   (PW[10+3]*2), -1, 1}},
+    { { 0,       205,           335,        43,      (PW[3]*2),                                          (PW[3]*2), -1, 1},
+      { 2,        25,           115,        43,  0,                                                                     (PW[11+3]*2),  1, 1}},
+    { { 1,       205,           335,        42, (H + (PW[7]*2) + D[3] + (PW[6]*2) + (PW[5]*2) + D[2]),   (PW[4]*2),  1, 1},
+      { 3,        25,           115,        42, (H + (PW[15+3]*2)+D[7]+(PW[14+3]*2) + (PW[13+3]*2)+D[6]+(PW[12+3]*2)),  (PW[12+3]*2), -1, 1}},
+    { { 1,       205,           335,        41, (H + (PW[7]*2) + D[3] + (PW[6]*2) + (PW[5]*2)),          (PW[5]*2), -1, 1},
+      { 3,        25,           115,        41, (H + (PW[15+3]*2)+D[7]+(PW[14+3]*2)),                                   (PW[13+3]*2),  1, 1}},
+    { { 1,       205,           335,        38, (H + (PW[7]*2) + D[3]),                                  (PW[6]*2),  1, 1},
+      { 3,        25,           115,        38, (H + (PW[15+3]*2)+D[7]+(PW[14+3]*2)),                                   (PW[14+3]*2), -1, 1}},
+//  { { 1,       205,           360,        38, (H + (PW[7]*2)),                                   (H + (PW[7]*2)), -1, 1},
+    { { 1,       205,           335,        38, (H + (PW[7]*2)),                                         (PW[7]*2), -1, 1},
+//    { 3,         0,           115,        38,  0,                                                                     (PW[15+3]*2)+H,  1, 1}},
+      { 3,        25,           115,        38,  H,                                                                     (PW[15+3]*2),  1, 1}},
+    { { 4,       180,           360,        75,  0,     PW[8],  1, 1},
+      { 4,         0,           180,        75,  PW[8], PW[8],  1, 1}},
+    { { 5,       180,           360,        75,  0,     PW[8],  1, 1},
+      { 5,         0,           180,        75,  PW[8], PW[8],  1, 1}},
+    { { 6,       180,           360,        75,  0,     PW[8],  1, 1},
+      { 6,         0,           180,        75,  PW[8], PW[8],  1, 1}}
+};
+
+
+//
+////for (int ang; ang<360; ang++) {
+//  this->angle
+//  for (int lvl; lvl<8; lvl++) {
+//    int side = int(ang / 180);
+//    int octo = LEVELS[lvl][side];
+//    if ((ang >= octo[1]) && (ang < octo[2])) {
+//      
+//      int theta_start = LEVELMAP[lvl][side][1];
+//      int theta_end = LEVELMAP[lvl][side][2];
+//      int stripid = LEVELMAP[lvl][side][0];
+//      int seg_offset = LEVELMAP[lvl][side][4];
+//      int seg_length = LEVELMAP[lvl][side][5];
+//      int dir = LEVELMAP[lvl][side][6];
+//      
+//      int index = angle_to_index(ang, lvl, side, theta_start, theta_end, seg_offset, seg_length, dir);
+//      int j = (stripid * NUM_LEDS_PER_STRIP) + index;
+//      driver.light_leds(j, r, g, b)
+//    }
+//  }
+//}
+
+int angle_to_index(int angle, int lvl, int side, int theta_start, int theta_end, int seg_offset, int seg_length, int dir) {
+  
+//  int side = 0;
+//  if ((angle % 360) < 180) {
+//    side = 1;
+//  }
+
+//  int* lvlsd = LEVELMAP[lvl][side];
+  
+//  int theta_start = lvlsd[1];
+//  int theta_end = lvlsd[2];
+//  int stripid = lvlsd[0];
+//  int seg_offset = lvlsd[4];
+//  int seg_length = lvlsd[5];
+//  int dir = lvlsd[6];
+  
+  // Serial.print(theta_start); Serial.print(" ");
+  // Serial.print(theta_end); Serial.print(" ");
+  // Serial.print(stripid); Serial.print(" ");
+  // Serial.println(seg_offset);
+  // Serial.print(seg_length); Serial.print(" ");
+  // Serial.print(side); Serial.print(" ");
+  // Serial.println(dir); 
+  // Serial.print((float((angle - theta_start) % 360) / float(theta_end - theta_start))); Serial.print(" ");
+  // Serial.println((float((theta_end - angle) % 360) / float(theta_end - theta_start)));
+  
+  if (lvl < 8) {
+    if ((angle >= theta_start) && (angle <= theta_end)) {
+      if (dir > 0) {
+        return seg_offset + int((float((angle - theta_start) % 360) / float(theta_end - theta_start)) * float(seg_length));
+      } else {
+        return seg_offset - int((float((angle - theta_start) % 360) / float(theta_end - theta_start)) * float(seg_length));
+      }
+    }
+    
+  } else {
+        return int((float((360 - angle) % 360) / 360.0) * float(seg_length));
+    
+  }
+  return -1;
+
+}
+
 // (3, (35 * 2) + 10, (34 * 2), 1) = 450 + 70 + 10, 68 = (522 590)   -- idx 0
 // (1, (39 * 2)     , (39 * 2), 1) = 150 + 78 + 10, 78 = (238 316)   -- idx 5
 // (0, (41 * 2)     , (41 * 2), 1) =   0 + 82 + 10, 82 = (92 174)   -- idx 7
-
-
-
-// int SIDES[2][8][5] = {
-//   {
-//     {3,  (H + (PW[7]*2)),          (PW[7]*2), -1, 1},
-//     {3,  (H + (PW[7]*2) + D[3]),   (PW[6]*2),  1, 1},
-//     {2,       (PW[5]*2),           (PW[5]*2), -1, 1},
-//     {2,      ((PW[5]*2) + D[2]),   (PW[4]*2),  1, 1},
-//     {1,       (PW[3]*2),           (PW[3]*2), -1, 1},
-//     {1,      ((PW[3]*2) + D[1]),   (PW[2]*2),  1, 1},
-//     {0,       (PW[1]*2),           (PW[1]*2), -1, 1},
-//     {0,      ((PW[1]*2) + D[0]),   (PW[0]*2),  1, 1}
-    
-// //    {3,  (H + (PW[7]*2)),          D[3], 1, 0},     // goal is to never use these, perhaps only use for testing
-// //    {2,  (H + (PW[5]*2)),          D[2], 1, 0},
-// //    {1,  (H + (PW[3]*2)),          D[1], 1, 0},
-// //    {0,  (H + (PW[1]*2)),          D[0], 1, 0}
-//   },
-
-
-//   {
-//     {7,  H,                               (PW[15]*2),  1, 1},
-//     {7, (H + (PW[15]*2)+D[7]+(PW[14]*2)), (PW[14]*2), -1, 1},
-//     {6,  0,                               (PW[13]*2),  1, 1},
-//     {6, (    (PW[13]*2)+D[6]+(PW[12]*2)), (PW[12]*2), -1, 1},
-//     {5,  0,                               (PW[11]*2),  1, 1},
-//     {5, (    (PW[11]*2)+D[5]+(PW[10]*2)), (PW[10]*2), -1, 1},
-//     {4,  0,                               (PW[9]*2),   1, 1},
-//     {4, (    (PW[9]*2)+D[4]+(PW[8]*2)),   (PW[8]*2),  -1, 1} 
-    
-// //    {7,  (H + (PW[15]*2)),                D[7],       0, 0},
-// //    {6,  (H + (PW[13]*2)),                D[6],       0, 0},
-// //    {5,  (H + (PW[11]*2)),                D[5],       0, 0},
-// //    {4,  (H + (PW[9]*2)),                 D[4],       0, 0}    
-//   }
-// };
-//
-//
-//int LEVELS[8][2][5] = {
-//  {{3, (H + (PW[7]*2))       , (PW[7]*2), -1, 1},      {7,  H                              , (PW[15]*2),  1, 1}}, // could knock out zeros as documentation here and all further... todo
-//  {{3, (H + (PW[7]*2) + D[3]), (PW[6]*2),  1, 1},      {7, (H + (PW[15]*2)+D[7]+(PW[14]*2)), (PW[14]*2), -1, 1}},
-//  {{2,      (PW[5]*2)        , (PW[5]*2), -1, 1},      {6,  0                              , (PW[13]*2),  1, 1}},
-//  {{2, (    (PW[5]*2) + D[2]), (PW[4]*2),  1, 1},      {6, (    (PW[13]*2)+D[6]+(PW[12]*2)), (PW[12]*2), -1, 1}},
-//  {{1,      (PW[3]*2)        , (PW[3]*2), -1, 1},      {5,  0                              , (PW[11]*2),  1, 1}},
-//  {{1, (    (PW[3]*2) + D[1]), (PW[2]*2),  1, 1},      {5, (    (PW[11]*2)+D[5]+(PW[10]*2)), (PW[10]*2), -1, 1}},
-//  {{0,      (PW[1]*2)        , (PW[1]*2), -1, 1},      {4,  0                              , (PW[9]*2),   1, 1}},
-//  {{0, (    (PW[1]*2) + D[0]), (PW[0]*2),  1, 1},      {4, (   (PW[9]*2)+D[4]+(PW[8]*2))   , (PW[8]*2),  -1, 1}}
-//};
-
-
-
 
 
 
@@ -275,25 +306,6 @@ int LEVELS[11][2][5] = {
 int iter_delta(int val, int delta, int lo=0, int hi=256) {
   return ((((val + delta) - lo) % (hi - lo)) + lo);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif
 

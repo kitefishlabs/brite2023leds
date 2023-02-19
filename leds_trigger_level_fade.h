@@ -47,12 +47,12 @@ public:
     if (dir > 0) {
       this->currentLevel_ = 0;  
     } else {
-      this->currentLevel_ = 0;  
+      this->currentLevel_ = NUM_LEVELS - 1;
     }
     
     this->currentSide_ = 0;
-    this->pulse_speed_ = 3;
-    this->speed__ = 1;
+    this->pulse_speed_ = 1;
+    this->speed__ = 2;
     this->counter_ = 0;
     this->subMode_ = 2;
     this->offset_ = 25;
@@ -92,7 +92,7 @@ public:
       }
       this->lvls_[this->currentLevel_] = 1;
       if ((this->currentLevel_ + dir) < 0) {
-        this->currentLevel_ = 7;
+        this->currentLevel_ = NUM_LEVELS - 1;
       } else {
         this->currentLevel_ = (this->currentLevel_ + dir) % NUM_LEVELS;
       }
@@ -128,7 +128,7 @@ public:
         int l = LEVELS[ll][this->currentSide_][2];
         int d = LEVELS[ll][this->currentSide_][3];
         int lt = LEVELS[ll][this->currentSide_][4];
-        int start = (r * 400) + o;
+        int start = (r * NUM_LEDS_PER_STRIP) + o;
 
         uint8_t v_ = attackDecayWave8(MIN(this->lvls_[ll], 256));
 

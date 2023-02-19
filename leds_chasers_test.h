@@ -40,7 +40,8 @@ public:
   void update_model() {
     this->index = (this->index + 1) % NUM_LEDS_PER_STRIP;
     if (this->index >= NUM_LEDS_PER_STRIP-1) {
-      this->strip = (this->strip + 1) % 8;
+     this->strip = (this->strip + 1) % NUMSTRIPS;
+     Serial.println(this->strip);
     }
   }
 
@@ -51,15 +52,15 @@ public:
      this->currentHue_ = CHSV(this->currentHue_.h + uint8_t(random(12)), this->currentHue_.s + uint8_t(random(32)), this->currentHue_.v + uint8_t(random(5)) );
      hsv2rgb_rainbow( this->currentHue_, this->currentRGB_);
    
-     Serial.print(this->currentHue_.h); Serial.print(" ");
-     Serial.print(this->currentHue_.s); Serial.print(" ");
-     Serial.print(this->currentHue_.v); Serial.print(" ");
-     Serial.println("");
+//     Serial.print(this->currentHue_.h); Serial.print(" ");
+//     Serial.print(this->currentHue_.s); Serial.print(" ");
+//     Serial.print(this->currentHue_.v); Serial.print(" ");
+//     Serial.println("");
    }
    
 //   for (int j = 0; j < NUMSTRIPS; j++) {
-     driver_->setPixel(((this->strip * NUM_LEDS_PER_STRIP) + this->index) % (NUMSTRIPS * NUM_LEDS_PER_STRIP), this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b, MASTER_BRIGHTNESS);
-     driver_->setBrightness(MASTER_BRIGHTNESS);
+     driver_->setPixel(((this->strip * NUM_LEDS_PER_STRIP) + this->index) % (NUMSTRIPS * NUM_LEDS_PER_STRIP), this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
+//     driver_->setBrightness(MASTER_BRIGHTNESS);
 //   }
    driver_->showPixels(); 
  }

@@ -7,7 +7,7 @@
 #define ALTERNATE_SIDES_PERIOD_MS             2000
 #define LIGHT_SIDES                       10
 #define TWINKLE_STARS                     11
-
+#define ROTATE_BANDS                      12
 
 
 

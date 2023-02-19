@@ -11,20 +11,22 @@
 
 #include "leds_chasers_test.h"
 #include "leds_twinkle_stars.h"
+#include "leds_rotate_bands.h"
 #include "leds_light_side.h"
 #include "leds_trigger_level.h"
 #include "leds_trigger_level_fade.h"
 #include "leds_spiral_level_sweep.h"
 #include "leds_trigger_level_sweep.h"
 
-#define ETHERNET_ACTIVE
+//#define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
-int _mode = SPIRAL_LEVELS_SWEEP_UP_INIT; // default = off
+//int _mode = TEST_CHASERS;
+int _mode = ROTATE_BANDS; // default = off
 int __mode = _mode;
 
-int __param0 = 5;
+int __param0 = 10;
 
 int sd = 0;
 int lvl = 0;
@@ -61,20 +63,19 @@ I2SClocklessLedDriver *driver = new I2SClocklessLedDriver();
 
 // PINS
 // 8 total pins in the full setup
-//int pins[NUMSTRIPS]={4,2, 13,12, 15,14, 33,32};
-int pins[NUMSTRIPS]={2,12,14,32, 4,13,15};
+int pins[NUMSTRIPS]={4,2, 13,12, 15,14, 32}; //,32};
+//int pins[NUMSTRIPS]={2,12,14,32, 4,13,15};
 
 // LEDs and states
 CRGBW leds[NUM_COLOR_CHANNELS*TOTAL_LEDS];
 
-uint8_t leds_state[TOTAL_LEDS];
-uint8_t leds_speed_state[TOTAL_LEDS];
+uint8_t leds_state_a[TOTAL_LEDS];
+uint8_t leds_state_b[TOTAL_LEDS];
 
 // mark leds when they change (certain modes)
 //bool states_dirty__flag[LIGHTABLE_LEDS];
 
 int counter = 0;
-
 
 AsyncUDP udp;
 
@@ -89,7 +90,8 @@ CHSV example_blue = CHSV(0, 120,64);
 
 LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
-LEDsTwinkleStars twinkleStars = LEDsTwinkleStars(driver, leds_state, leds_speed_state);
+LEDsTwinkleStars twinkleStars = LEDsTwinkleStars(driver, leds_state_a, leds_state_b);
+LEDsRotateBands rotateBands = LEDsRotateBands(driver);
 LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
 LEDsSpiralLevelSweep spiralLevelSweeps = LEDsSpiralLevelSweep(driver);
 LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
@@ -207,8 +209,8 @@ void setup() {
    counter = 0;
 
   for (int i=0; i< TOTAL_LEDS; i++) {
-    leds_state[i] = 0;
-    leds_speed_state[i] = 0;
+    leds_state_a[i] = 0;
+    leds_state_b[i] = 0;
   }
 
   lightSides.init();
@@ -217,6 +219,7 @@ void setup() {
   spiralLevelSweeps.init(1);
   triggerLevelFades.init(1);
   twinkleStars.init();
+  rotateBands.init();
 }
 
 
@@ -257,6 +260,18 @@ void loop() {
       
       twinkleStars.update_model();
       twinkleStars.loop();
+      
+    }
+
+  } else if (_mode == ROTATE_BANDS) {
+    
+    if ((millis() % __param0) < 10) {
+
+//      if (random(1000) < 50) {
+//        clear_leds();
+//      }
+      
+      rotateBands.loop();
       
     }
 

@@ -21,12 +21,9 @@ private:
 public:
   LEDsLightSide(I2SClocklessLedDriver *driver) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
-    // currentHSV_ = CHSV(0,0,0);
-    // currentRGB_ = CRGB(0,0,0);
-    // index = 0;
-    speed_ = 1;
     currentHSV_ = CHSV(0,0,0);
     currentRGB_ = CRGB(0,0,0);
+    speed_ = 1;
     currentSide_ = 0;
   };
 
@@ -57,7 +54,7 @@ public:
     // light-sides is a one-shot, so this loop is executed once when the whole side updates.
     // one-shot effects allow us to use conventional for-loops in the effect's loop() function
     
-    for (int i=0; i<8; i++) {
+    for (int i=0; i<NUM_LEVELS; i++) {
       
       int r = SIDES[this->currentSide_][i][0];
       int o = SIDES[this->currentSide_][i][1];
