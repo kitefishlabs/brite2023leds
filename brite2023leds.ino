@@ -14,6 +14,7 @@
 #include "leds_rotate_bands.h"
 #include "leds_rats_in_a_cage.h"
 #include "leds_snowfall.h"
+#include "leds_fake_spectra.h"
 #include "leds_light_side.h"
 #include "leds_trigger_level.h"
 #include "leds_trigger_level_fade.h"
@@ -25,7 +26,7 @@
 
 
 //int _mode = TEST_CHASERS;
-int _mode = SNOWFALL; // default = off
+int _mode = FAKE_SPECTRA; // default = off
 int __mode = _mode;
 
 int __param0 = 50;
@@ -98,6 +99,7 @@ LEDsTwinkleStars twinkleStars = LEDsTwinkleStars(driver, leds_state_a, leds_stat
 LEDsRatsInACage ratsInACage = LEDsRatsInACage(driver, leds_state_a, leds_state_c);
 LEDsRotateBands rotateBands = LEDsRotateBands(driver);
 LEDsSnowfall snowfall = LEDsSnowfall(driver, angles_state);
+LEDsFakeSpectra fakeSpectra = LEDsFakeSpectra(driver);
 LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
 LEDsSpiralLevelSweep spiralLevelSweeps = LEDsSpiralLevelSweep(driver);
 LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
@@ -228,6 +230,7 @@ void setup() {
   rotateBands.init();
   ratsInACage.init();
   snowfall.init();
+  fakeSpectra.init();
 }
 
 
@@ -306,6 +309,18 @@ void loop() {
       
     }
 
+  } else if (_mode == FAKE_SPECTRA) {
+    
+    if ((millis() % __param0) < 10) {
+
+//      if (random(1000) < 50) {
+//        clear_leds();
+//      }
+      fakeSpectra.update_model();
+      fakeSpectra.loop();
+      
+    }
+    
   } else if (_mode == TRIGGER_LEVELS_UP) {
 
     if ((millis() % __param0) < 10) {

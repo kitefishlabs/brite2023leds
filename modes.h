@@ -11,6 +11,7 @@
 #define ROTATE_BANDS                      12
 #define RATS_IN_A_CAGE                    13
 #define SNOWFALL                          14
+#define FAKE_SPECTRA                      15
 
 
 #define TRIGGER_LEVELS_DOWN               20
