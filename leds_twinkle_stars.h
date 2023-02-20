@@ -24,13 +24,10 @@ private:
 public:
   LEDsTwinkleStars(I2SClocklessLedDriver *driver, uint8_t *states, uint8_t *speeds ) {
     driver_ = driver;
-    // currentHSV_ = CHSV(0,0,0);
-    // currentRGB_ = CRGB(0,0,0);
-    // index = 0;
-    speed_ = 1;
     currentHSV_ = CHSV(BLUE,200,240);
     currentRGB_ = CRGB(0,0,0);
-//    currentSide_ = 0;
+    // index = 0;
+    speed_ = 1;    
     density_ = 100;               // (density_ / 1000)
     leds_state_ = states;
     leds_speed_state_ = speeds;

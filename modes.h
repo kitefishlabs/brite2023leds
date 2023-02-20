@@ -5,16 +5,16 @@
 #define TEST_CHASERS                       1
 
 #define ALTERNATE_SIDES_PERIOD_MS             2000
+
 #define LIGHT_SIDES                       10
 #define TWINKLE_STARS                     11
 #define ROTATE_BANDS                      12
-
+#define RATS_IN_A_CAGE                    13
+#define SNOWFALL                          14
 
 
 #define TRIGGER_LEVELS_DOWN               20
 #define TRIGGER_LEVELS_UP                 21
-
-
 
 
 #define LOOP_LEVELS_SWEEP_DOWN            30

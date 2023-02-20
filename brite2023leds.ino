@@ -12,6 +12,8 @@
 #include "leds_chasers_test.h"
 #include "leds_twinkle_stars.h"
 #include "leds_rotate_bands.h"
+#include "leds_rats_in_a_cage.h"
+#include "leds_snowfall.h"
 #include "leds_light_side.h"
 #include "leds_trigger_level.h"
 #include "leds_trigger_level_fade.h"
@@ -23,10 +25,10 @@
 
 
 //int _mode = TEST_CHASERS;
-int _mode = ROTATE_BANDS; // default = off
+int _mode = SNOWFALL; // default = off
 int __mode = _mode;
 
-int __param0 = 10;
+int __param0 = 50;
 
 int sd = 0;
 int lvl = 0;
@@ -71,6 +73,8 @@ CRGBW leds[NUM_COLOR_CHANNELS*TOTAL_LEDS];
 
 uint8_t leds_state_a[TOTAL_LEDS];
 uint8_t leds_state_b[TOTAL_LEDS];
+bool leds_state_c[TOTAL_LEDS];
+float angles_state[360];
 
 // mark leds when they change (certain modes)
 //bool states_dirty__flag[LIGHTABLE_LEDS];
@@ -91,7 +95,9 @@ CHSV example_blue = CHSV(0, 120,64);
 LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
 LEDsTwinkleStars twinkleStars = LEDsTwinkleStars(driver, leds_state_a, leds_state_b);
+LEDsRatsInACage ratsInACage = LEDsRatsInACage(driver, leds_state_a, leds_state_c);
 LEDsRotateBands rotateBands = LEDsRotateBands(driver);
+LEDsSnowfall snowfall = LEDsSnowfall(driver, angles_state);
 LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
 LEDsSpiralLevelSweep spiralLevelSweeps = LEDsSpiralLevelSweep(driver);
 LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
@@ -220,6 +226,8 @@ void setup() {
   triggerLevelFades.init(1);
   twinkleStars.init();
   rotateBands.init();
+  ratsInACage.init();
+  snowfall.init();
 }
 
 
@@ -263,6 +271,17 @@ void loop() {
       
     }
 
+  } else if (_mode == RATS_IN_A_CAGE) {
+    
+    if ((millis() % __param0) < 10) {
+      
+//      clear_leds();
+      
+      ratsInACage.update_model();
+      ratsInACage.loop();
+      
+    }
+
   } else if (_mode == ROTATE_BANDS) {
     
     if ((millis() % __param0) < 10) {
@@ -272,6 +291,18 @@ void loop() {
 //      }
       
       rotateBands.loop();
+      
+    }
+
+  } else if (_mode == SNOWFALL) {
+    
+    if ((millis() % __param0) < 10) {
+
+//      if (random(1000) < 50) {
+//        clear_leds();
+//      }
+      snowfall.update_model();
+      snowfall.loop();
       
     }
 
