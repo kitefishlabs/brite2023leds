@@ -4,7 +4,7 @@
 #include "I2SClocklessLedDriver.h"
 
 #include "common.h"
-#include "runnable.h"
+
 #include "colors.h"
 #include "modes.h"
 
@@ -20,6 +20,7 @@ private:
   int counter_;
   uint8_t subMode_;
   int angle_;
+  int num_bands_;
   
 public:
   LEDsRotateBands(I2SClocklessLedDriver *driver) {      // int sides[2][NUMSTRIPS][5]
@@ -31,17 +32,44 @@ public:
 //    currentSide_ = 0;
     subMode_ = 2;
     angle_ = 0;
+    num_bands_ = 4;
   };
-
 
   void init() {
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     this->angle_ = 0;
+    this->num_bands_ = 4;
   };
 
-  void setup() {
-    this->init();
+  void draw_at_angle(int angle, CRGB currentRGB) {
+    for (int lvl=0; lvl<NUM_LEVELS; lvl++) {
+      int side = 1 - int(angle / 180);
+      int* octo = LEVELMAP[lvl][side];
+//      Serial.print(lvl); Serial.print(" "); Serial.println(side);
+//      Serial.print(octo[1]);Serial.print(" "); Serial.println(octo[2]);
+//      Serial.println(" ");
+      if ((angle >= octo[1]) && (angle < octo[2])) {
+        
+        int theta_start = LEVELMAP[lvl][side][1];
+        int theta_end = LEVELMAP[lvl][side][2];
+        int stripid = LEVELMAP[lvl][side][0];
+        int seg_offset = LEVELMAP[lvl][side][4];
+        int seg_length = LEVELMAP[lvl][side][5];
+        int dir = LEVELMAP[lvl][side][6];
+        
+        int index = angle_to_index(angle, lvl, side, theta_start, theta_end, seg_offset, seg_length, dir);
+
+        int j = (stripid * NUM_LEDS_PER_STRIP) + index;
+        
+//        Serial.println(stripid);
+//        Serial.println(index);
+//        Serial.println(j);
+//        Serial.println(" ");
+        
+        this->driver_->setPixel(j, currentRGB.r, currentRGB.g, currentRGB.b);
+      }
+    }
   };
 
   void loop() {
@@ -55,33 +83,11 @@ public:
     //for (int ang; ang<360; ang++) {
     this->angle_ = (this->angle_ + 1) % 360;
 //    Serial.println(this->angle_);
-    for (int lvl=0; lvl<NUM_LEVELS; lvl++) {
-      int side = 1 - int(this->angle_ / 180);
-      int* octo = LEVELMAP[lvl][side];
-//      Serial.print(lvl); Serial.print(" "); Serial.println(side);
-//      Serial.print(octo[1]);Serial.print(" "); Serial.println(octo[2]);
-//      Serial.println(" ");
-      if ((this->angle_ >= octo[1]) && (this->angle_ < octo[2])) {
-        
-        int theta_start = LEVELMAP[lvl][side][1];
-        int theta_end = LEVELMAP[lvl][side][2];
-        int stripid = LEVELMAP[lvl][side][0];
-        int seg_offset = LEVELMAP[lvl][side][4];
-        int seg_length = LEVELMAP[lvl][side][5];
-        int dir = LEVELMAP[lvl][side][6];
-        
-        int index = angle_to_index(this->angle_, lvl, side, theta_start, theta_end, seg_offset, seg_length, dir);
-
-        int j = (stripid * NUM_LEDS_PER_STRIP) + index;
-        
-//        Serial.println(stripid);
-//        Serial.println(index);
-//        Serial.println(j);
-//        Serial.println(" ");
-        
-        this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
-      }
+    
+    for (int a=0; a<this->num_bands_; a++) {
+      this->draw_at_angle((a * (360 / max(this->num_bands_, 1))), this->currentRGB_);
     }
+
     this->driver_->showPixels(); 
     
 //     Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 

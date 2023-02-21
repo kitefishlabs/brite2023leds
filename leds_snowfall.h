@@ -4,7 +4,7 @@
 #include "I2SClocklessLedDriver.h"
 
 #include "common.h"
-#include "runnable.h"
+
 #include "colors.h"
 #include "modes.h"
 
@@ -17,6 +17,7 @@ private:
   CRGB currentRGB_ = CRGB(0,0,0);
   float *angle_state_;
   int speed_;
+  int fall_speed_;
   int spacer_;
   int jitter_;
   
@@ -27,6 +28,7 @@ public:
     currentRGB_ = CRGB(0,0,0);
     angle_state_ = angle_state;
     speed_ = 1;
+    fall_speed_ = 5;      
     spacer_ = 12;
     jitter_ = 4; 
     
@@ -39,17 +41,20 @@ public:
     int rnd_offset = random(this->jitter_) - (this->jitter_/2);
     for (int ang=0; ang<360; ang++) {
       if ((ang%this->spacer_) == 0) {
-        this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS);
-        Serial.println(ang);
-        Serial.println((ang+rnd_offset)%360);
-        Serial.println(angle_state_[(ang+rnd_offset)%360]);
-        Serial.println(" ");
+        this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS) - int8_t(float(random8())/5120.0); // 0.0 -> 0.5 random starting point
+//         Serial.println(ang);
+//         Serial.println((ang+rnd_offset)%360);
+//         Serial.println(angle_state_[(ang+rnd_offset)%360]);
+//         Serial.println(" ");
         rnd_offset = random(this->jitter_) - (this->jitter_/2);
       }
     }
   };
 
-  void setup() {
+  void load_preset(int *preset) {
+    this->fall_speed_ = preset[1];
+    this->spacer_ = preset[2];
+    this->jitter_ = preset[3];
     this->init();
   };
 
@@ -60,14 +65,14 @@ public:
     
     for (int ang=0; ang<360; ang++) { 
       if ((this->angle_state_[ang] >= 0.5) && (random8() > 24)) {
-        this->angle_state_[ang] -= 0.05 + (float(random8())/25600.0);
+        this->angle_state_[ang] -= (0.01 * float(this->fall_speed_)) + (float(random8())/25600.0);
 //        Serial.println(this->angle_state_[ang]);
       }
       if ((this->angle_state_[ang] < 0.5) && (this->angle_state_[ang] > 0.0)) {
         this->angle_state_[ang] = float(NUM_LEVELS);
-//        this->angle_state_[ang] = 0.0;
-//        this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS);
-//        rnd_offset = random(this->jitter_) - (this->jitter_/2);
+      //  this->angle_state_[ang] = 0.0;                                      TODO: Test this and reinstate
+      //  this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS);
+      //  rnd_offset = random(this->jitter_) - (this->jitter_/2);
       }
       
     }
@@ -138,36 +143,3 @@ public:
 
 };
 #endif
-
-//
-//    //for (int ang; ang<360; ang++) {
-//    this->angle_ = (this->angle_ + 1) % 360;
-////    Serial.println(this->angle_);
-//    for (int lvl=0; lvl<NUM_LEVELS; lvl++) {
-//      int side = 1 - int(this->angle_ / 180);
-//      int* octo = LEVELMAP[lvl][side];
-////      Serial.print(lvl); Serial.print(" "); Serial.println(side);
-////      Serial.print(octo[1]);Serial.print(" "); Serial.println(octo[2]);
-////      Serial.println(" ");
-//      if ((this->angle_ >= octo[1]) && (this->angle_ < octo[2])) {
-//        
-//        int theta_start = LEVELMAP[lvl][side][1];
-//        int theta_end = LEVELMAP[lvl][side][2];
-//        int stripid = LEVELMAP[lvl][side][0];
-//        int seg_offset = LEVELMAP[lvl][side][4];
-//        int seg_length = LEVELMAP[lvl][side][5];
-//        int dir = LEVELMAP[lvl][side][6];
-//        
-//        int index = angle_to_index(this->angle_, lvl, side, theta_start, theta_end, seg_offset, seg_length, dir);
-//
-//        int j = (stripid * NUM_LEDS_PER_STRIP) + index;
-//        
-////        Serial.println(stripid);
-////        Serial.println(index);
-////        Serial.println(j);
-////        Serial.println(" ");
-//        
-//        this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
-//      }
-//    }
-//    this->driver_->showPixels(); 

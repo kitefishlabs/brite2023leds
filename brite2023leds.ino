@@ -21,20 +21,26 @@
 #include "leds_spiral_level_sweep.h"
 #include "leds_trigger_level_sweep.h"
 
+#include "runner.h"
+
 //#define ETHERNET_ACTIVE
 #define FULL_DMA_BUFFER
 
 
 //int _mode = TEST_CHASERS;
-int _mode = FAKE_SPECTRA; // default = off
+int _mode = 14; // default = off
 int __mode = _mode;
 
-int __param0 = 50;
+int chosen_preset[7];
+int last_preset_ms = millis(); // MS
 
-int sd = 0;
-int lvl = 0;
-int offset = 10;
-int lvls[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+int __param1 = 50;
+int __param2 = 0;
+int __param3 = 0;
+int __param4 = 0;
+int __param5 = 0;
+
+
 /* layout 
 
 BOTTOM - rough estimate, TODO plug in actual data
@@ -80,18 +86,15 @@ float angles_state[360];
 // mark leds when they change (certain modes)
 //bool states_dirty__flag[LIGHTABLE_LEDS];
 
-int counter = 0;
-
 AsyncUDP udp;
 
 static bool eth_connected = false;
 
 CHSV default_color = CHSV(0, 255, 128);
-
 CHSV currentHue = CHSV(0,0,0);
 CRGB currentRGB = CRGB::Black;
-CHSV example_blue = CHSV(0, 120,64);
 
+LEDsPresetsRunner presets = LEDsPresetsRunner();
 
 LEDsChasersTest chasersTest = LEDsChasersTest(driver);
 LEDsLightSide lightSides = LEDsLightSide(driver);
@@ -109,9 +112,9 @@ LEDsTriggerLevelFade triggerLevelFades = LEDsTriggerLevelFade(driver);
 
 void receiveMode(OSCMessage &msg) {
   __mode = int(msg.getInt(0));
-  __param0 = int(msg.getInt(1));
+  __param1 = int(msg.getInt(1));
   Serial.print("mode to be: "); Serial.println(__mode);
-  Serial.print("Params: "); Serial.println(__param0);
+  Serial.print("Params: "); Serial.println(__param1);
 }
 
 
@@ -156,12 +159,12 @@ void WiFiEvent(WiFiEvent_t event) {
 
 /*  SEE END OF DOCUMENT  */
 
-void clear_leds(uint16_t rolloff=0) {
-//  Serial.print("R:: "); Serial.println(rolloff);
+void clear_leds() {
   for (int i = 0; i < (NUMSTRIPS * NUM_LEDS_PER_STRIP); i++) {
     driver->setPixel(i, 0, 0, 0);
   }
    driver->showPixels();
+//   Serial.println("clear leds");
 }
 
 void reset() {
@@ -214,13 +217,13 @@ void setup() {
  }
 #endif
    Serial.println("END SETUP");
-   counter = 0;
 
   for (int i=0; i< TOTAL_LEDS; i++) {
     leds_state_a[i] = 0;
     leds_state_b[i] = 0;
   }
-
+  
+  presets.init();
   lightSides.init();
   triggerLevels.init();
   triggerLevelSweeps.init(1);
@@ -231,21 +234,38 @@ void setup() {
   ratsInACage.init();
   snowfall.init();
   fakeSpectra.init();
+
+  last_preset_ms = millis(); // MS
 }
 
 
+
+
 void loop() {
+
+  if ((millis() - last_preset_ms) > 5000) {
+    int choice = presets.get_weighted_random_preset();
+    int* chosen_preset = PRESETS[choice];
+//    Serial.println((int)chosen_preset[0]);
+    __mode = (int)chosen_preset[0];
+    __param1 = (int)chosen_preset[1];
+    __param2 = (int)chosen_preset[2];
+    __param3 = (int)chosen_preset[3];
+    __param4 = (int)chosen_preset[4];
+    __param5 = (int)chosen_preset[5];
+    last_preset_ms = millis();
+  }
   
   if (__mode != _mode) {
-    Serial.print("Mode changed: "); Serial.println(_mode);
+    Serial.print("Mode changed from "); Serial.print(_mode); Serial.print(" to: "); Serial.println(__mode);
     _mode = __mode;
     reset();
-    counter = 0;
   }
   
   if (_mode == DARK) {
-
-    clear_leds(max(0, __param0));
+    
+//    Serial.println("DARK");
+    clear_leds();
 
   } else if (_mode == TEST_CHASERS) {
 
@@ -254,7 +274,7 @@ void loop() {
 
   } else if (_mode == LIGHT_SIDES) {
     
-    if ((millis() % __param0) < 10) {
+    if ((millis() % __param1) < 10) {
       
       clear_leds();
       
@@ -265,7 +285,7 @@ void loop() {
 
   } else if (_mode == TWINKLE_STARS) {
     
-    if ((millis() % __param0) < 10) {
+    if ((millis() % __param1) < 10) {
       
 //      clear_leds();
       
@@ -276,7 +296,7 @@ void loop() {
 
   } else if (_mode == RATS_IN_A_CAGE) {
     
-    if ((millis() % __param0) < 10) {
+    if ((millis() % __param1) < 10) {
       
 //      clear_leds();
       
@@ -287,11 +307,7 @@ void loop() {
 
   } else if (_mode == ROTATE_BANDS) {
     
-    if ((millis() % __param0) < 10) {
-
-//      if (random(1000) < 50) {
-//        clear_leds();
-//      }
+    if ((millis() % __param1) < 10) {
       
       rotateBands.loop();
       
@@ -299,11 +315,8 @@ void loop() {
 
   } else if (_mode == SNOWFALL) {
     
-    if ((millis() % __param0) < 10) {
+    if ((millis() % __param1) < 10) {
 
-//      if (random(1000) < 50) {
-//        clear_leds();
-//      }
       snowfall.update_model();
       snowfall.loop();
       
@@ -311,11 +324,8 @@ void loop() {
 
   } else if (_mode == FAKE_SPECTRA) {
     
-    if ((millis() % __param0) < 10) {
+    if ((millis() % __param1) < 10) {
 
-//      if (random(1000) < 50) {
-//        clear_leds();
-//      }
       fakeSpectra.update_model();
       fakeSpectra.loop();
       
@@ -323,7 +333,7 @@ void loop() {
     
   } else if (_mode == TRIGGER_LEVELS_UP) {
 
-    if ((millis() % __param0) < 10) {
+    if ((millis() % __param1) < 10) {
       clear_leds();
 
       // up is down, down is up, peace is war
@@ -333,7 +343,7 @@ void loop() {
 
  } else if (_mode == TRIGGER_LEVELS_DOWN) {
    
-   if ((millis() % __param0) < 10) {
+   if ((millis() % __param1) < 10) {
      clear_leds();
      
      triggerLevels.update_model(1);
@@ -349,7 +359,7 @@ void loop() {
 
  } else if (_mode == LOOP_LEVELS_SWEEP_UP) {
    
-   if ((millis() % __param0) < 10) {
+   if ((millis() % __param1) < 10) {
 //     clear_leds();
      triggerLevelSweeps.update_model(1);
      triggerLevelSweeps.loop();
@@ -363,7 +373,7 @@ void loop() {
 
  } else if (_mode == LOOP_LEVELS_SWEEP_DOWN) {
    
-   if ((millis() % __param0) < 10) {
+   if ((millis() % __param1) < 10) {
 //     clear_leds();
      triggerLevelSweeps.update_model(-1);
      triggerLevelSweeps.loop();
@@ -380,7 +390,7 @@ void loop() {
 
  } else if (_mode == SPIRAL_LEVELS_SWEEP_UP) {
    
-   if ((millis() % __param0) < 10) {
+   if ((millis() % __param1) < 10) {
 //     clear_leds();
      spiralLevelSweeps.update_model(1);
      spiralLevelSweeps.loop();
@@ -394,7 +404,7 @@ void loop() {
 
  } else if (_mode == SPIRAL_LEVELS_SWEEP_DOWN) {
    
-   if ((millis() % __param0) < 10) {
+   if ((millis() % __param1) < 10) {
 //     clear_leds();
      spiralLevelSweeps.update_model(-1);
      spiralLevelSweeps.loop();
@@ -410,7 +420,7 @@ void loop() {
 
  } else if (_mode == LOOP_LEVELS_FADE_UP) {
    
-   if ((millis() % __param0) < 10) {
+   if ((millis() % __param1) < 10) {
 //     clear_leds();
      triggerLevelFades.update_model(1);
      triggerLevelFades.loop();
@@ -424,12 +434,11 @@ void loop() {
 
  } else if (_mode == LOOP_LEVELS_FADE_DOWN) {
    
-   if ((millis() % __param0) < 10) {
+   if ((millis() % __param1) < 10) {
 //     clear_leds();
      triggerLevelFades.update_model(-1);
      triggerLevelFades.loop();
    }
 
   }
-
 }

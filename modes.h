@@ -17,7 +17,6 @@
 #define TRIGGER_LEVELS_DOWN               20
 #define TRIGGER_LEVELS_UP                 21
 
-
 #define LOOP_LEVELS_SWEEP_DOWN            30
 #define LOOP_LEVELS_SWEEP_DOWN_INIT      130
 #define LOOP_LEVELS_SWEEP_UP              31
@@ -33,6 +32,10 @@
 #define SPIRAL_LEVELS_SWEEP_DOWN_INIT    134
 #define SPIRAL_LEVELS_SWEEP_UP            35
 #define SPIRAL_LEVELS_SWEEP_UP_INIT      135
+
+#endif
+
+
 
 
 
@@ -61,5 +64,3 @@
 // #define LOOP_PANELS_STRIPES_UP_RIGHT      65
 // #define LOOP_PANELS_STRIPES_DOWN_LEFT     66
 // #define LOOP_PANELS_STRIPES_DOWN_RIGHT    67
-
-#endif

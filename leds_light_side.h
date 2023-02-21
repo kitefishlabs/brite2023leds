@@ -4,7 +4,7 @@
 #include "I2SClocklessLedDriver.h"
 
 #include "common.h"
-#include "runnable.h"
+
 #include "colors.h"
 #include "modes.h"
 
@@ -41,9 +41,11 @@ public:
     // update model is called at the start of each main loop func call
     // calling rgb func here should cause rainbowish randomish effect
     // call it at the change of the side var to update color in sync with side changes
+    
     this->currentSide_  = 1 - this->currentSide_;
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
+
 //     Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
 //     Serial.println(this->currentSide_);
 //     Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);

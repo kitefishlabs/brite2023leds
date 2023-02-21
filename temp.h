@@ -22,12 +22,12 @@ int LEVELMAP[NUM_LEVELS][2][8] = {
       { 3,        25,           155,        38, (H + (PW[15+3]*2)+D[7]+(PW[14+3]*2)),                                   (PW[14+3]*2), -1, 1}},
     { { 1,       205,           335,        38, (H + (PW[7]*2)),                                         (PW[7]*2), -1, 1},
       { 3,        25,           155,        38,  H,                                                                     (PW[15+3]*2),  1, 1}},
-    { { 4,       180,           360,       100,  (PW[8]*2), (PW[8]*2),   -1, 1},
-      { 4,         0,           180,       100,  (PW[8]*2), (PW[8]*2),   -1, 1}},
-    { { 5,       180,           360,        98,  (PW[9]*2), (PW[9]*2),   -1, 1},
-      { 5,         0,           180,        98,  (PW[9]*2), (PW[9]*2),   -1, 1}},
-    { { 6,       180,           360,        96,  (PW[10]*2), (PW[10]*2), -1, 1},
-      { 6,         0,           180,        96,  (PW[10]*2), (PW[10]*2), -1, 1}}
+    { { 4,         0,           360,       100,  (PW[8]*2), (PW[8]*2),   -1, 1},
+      { 4,         0,           360,       100,  (PW[8]*2), (PW[8]*2),   -1, 1}},
+    { { 5,         0,           360,        98,  (PW[9]*2), (PW[9]*2),   -1, 1},
+      { 5,         0,           360,        98,  (PW[9]*2), (PW[9]*2),   -1, 1}},
+    { { 6,         0,           360,        96,  (PW[10]*2), (PW[10]*2), -1, 1},
+      { 6,         0,           360,        96,  (PW[10]*2), (PW[10]*2), -1, 1}}
 };
 
 void setup() {
@@ -77,17 +77,18 @@ int angle_to_index(int angle, int lvl) {
   int seg_offset = lvlsd[4];
   int seg_length = lvlsd[5];
 
+
   int dir = lvlsd[6];
-  Serial.println(theta_start);
-  Serial.println(theta_end);
-  Serial.println(stripid);
-  Serial.println(seg_offset);
-  Serial.println(seg_length);
-  Serial.println(side);
-  Serial.println(dir);
-  Serial.println((float((angle - theta_start) % 360) / float(theta_end - theta_start)));
-  Serial.println((float((theta_end - angle) % 360) / float(theta_end - theta_start)));
-  Serial.println("");
+  // Serial.print(theta_start); Serial.print(" ");
+  // Serial.print(theta_end); Serial.print(" ");
+  // Serial.print(stripid); Serial.print(" ");
+  // Serial.println(seg_offset);
+  // Serial.print(seg_length); Serial.print(" ");
+  // Serial.print(side); Serial.print(" ");
+  // Serial.println(dir); 
+  // Serial.print((float((angle - theta_start) % 360) / float(theta_end - theta_start))); Serial.print(" ");
+  // Serial.println((float((theta_end - angle) % 360) / float(theta_end - theta_start)));
+  
   if (lvl < 8) {
     if ((angle >= theta_start) && (angle <= theta_end)) {
       if (dir > 0) {
@@ -98,7 +99,7 @@ int angle_to_index(int angle, int lvl) {
     }
     
   } else {
-        return int((float((360 - angle) % 360) / 360.0) * float(seg_length * 2));
+        return int((float((360 - angle) % 360) / 360.0) * float(seg_length));
     
   }
   return -1;
