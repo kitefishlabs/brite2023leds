@@ -34,10 +34,10 @@ public:
     dirty_state_ = dirty_states;
     speed_ = 1;
     jitter_ = 3;
-    spacer_ = 10;
+    spacer_ = 32;
     prob_ = 64;
     hop_ = 3;
-    tail_length_ = 1;
+    tail_length_ = 3;
     dirty_ = false;
   };
 

@@ -20,6 +20,7 @@ private:
   int fall_speed_;
   int spacer_;
   int jitter_;
+  int restart_prob_;
   
 public:
   LEDsSnowfall(I2SClocklessLedDriver *driver, float *angle_state) {
@@ -28,10 +29,10 @@ public:
     currentRGB_ = CRGB(0,0,0);
     angle_state_ = angle_state;
     speed_ = 1;
-    fall_speed_ = 5;      
-    spacer_ = 12;
-    jitter_ = 4; 
-    
+    fall_speed_ = 10;      
+    spacer_ = 6;
+    jitter_ = 9; 
+    restart_prob_ = 8;
   };
 
   void init() {
@@ -41,7 +42,7 @@ public:
     int rnd_offset = random(this->jitter_) - (this->jitter_/2);
     for (int ang=0; ang<360; ang++) {
       if ((ang%this->spacer_) == 0) {
-        this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS) - int8_t(float(random8())/5120.0); // 0.0 -> 0.5 random starting point
+        this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS) - int8_t(float(random8())/640.0); // 11.0 -> 7.0 random starting point
 //         Serial.println(ang);
 //         Serial.println((ang+rnd_offset)%360);
 //         Serial.println(angle_state_[(ang+rnd_offset)%360]);
@@ -55,6 +56,7 @@ public:
     this->fall_speed_ = preset[1];
     this->spacer_ = preset[2];
     this->jitter_ = preset[3];
+    this->restart_prob_ = preset[4];
     this->init();
   };
 
@@ -65,14 +67,18 @@ public:
     
     for (int ang=0; ang<360; ang++) { 
       if ((this->angle_state_[ang] >= 0.5) && (random8() > 24)) {
-        this->angle_state_[ang] -= (0.01 * float(this->fall_speed_)) + (float(random8())/25600.0);
+        this->angle_state_[ang] -= (0.001 * float(this->fall_speed_)) + (float(random8())/25600.0);
 //        Serial.println(this->angle_state_[ang]);
       }
       if ((this->angle_state_[ang] < 0.5) && (this->angle_state_[ang] > 0.0)) {
-        this->angle_state_[ang] = float(NUM_LEVELS);
-      //  this->angle_state_[ang] = 0.0;                                      TODO: Test this and reinstate
-      //  this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS);
-      //  rnd_offset = random(this->jitter_) - (this->jitter_/2);
+        int rnd_offset = random(this->jitter_) - (this->jitter_/2);
+//        this->angle_state_[ang] = float(NUM_LEVELS);
+        this->angle_state_[ang] = 0.0;                                      // TODO: Test this and reinstate
+        this->angle_state_[(ang+rnd_offset)%360] = float(NUM_LEVELS) - int8_t(float(random8())/640.0); // 11.0 -> 7.0 random starting point
+      }
+
+      if ((this->angle_state_[ang] == 0.0) && (random16() < this->restart_prob_)) {
+        this->angle_state_[ang] = float(NUM_LEVELS) - int8_t(float(random8())/640.0); // 11.0 -> 7.0 random starting point
       }
       
     }

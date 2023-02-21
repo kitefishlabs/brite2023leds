@@ -51,7 +51,7 @@ public:
     }
     
     this->currentSide_ = 0;
-    this->pulse_speed_ = 1;
+    this->pulse_speed_ = 5;
     this->speed__ = 2;
     this->counter_ = 0;
     this->subMode_ = 2;

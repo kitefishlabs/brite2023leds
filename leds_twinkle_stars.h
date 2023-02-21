@@ -20,6 +20,8 @@ private:
   uint8_t *leds_state_;
   uint8_t *leds_speed_state_;
   int density_;
+  int speed_lo_;
+  int speed_hi_;
 
 public:
   LEDsTwinkleStars(I2SClocklessLedDriver *driver, uint8_t *states, uint8_t *speeds ) {
@@ -28,9 +30,11 @@ public:
     currentRGB_ = CRGB(0,0,0);
     // index = 0;
     speed_ = 1;    
-    density_ = 100;               // (density_ / 1000)
     leds_state_ = states;
     leds_speed_state_ = speeds;
+    density_ = 10;               // (density_ / 1000)
+    speed_lo_ = 3;
+    speed_hi_ = 23;
   };
 
   void init() {
@@ -40,7 +44,7 @@ public:
     for (int i=0; i< TOTAL_LEDS; i++) {
       if (random(1000) < this->density_) {
         this->leds_state_[i] = 1;
-        this->leds_speed_state_[i] = random(5) + 2;
+        this->leds_speed_state_[i] = random8(this->speed_lo_, this->speed_hi_);
         Serial.print(i); Serial.print(" "); Serial.print(leds_state_[i]); Serial.print(" "); Serial.println(leds_speed_state_[i]);
       }
     }

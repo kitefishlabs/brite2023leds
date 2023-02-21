@@ -10,22 +10,22 @@
 #define NUM_PRESETS 16
 
 int PRESETS[NUM_PRESETS][7] = {
-    // { DARK,                           period,  0,          0,        0,            0,          0,            0,        0,          0 },                     // 
-    // { TEST_CHASERS,                   period,  0,          0,        0,            0,          0,            0,        0,          0 },
-    // { LIGHT_SIDES,                    period,  speed,                                                        palette,  palette_i,  palette_j },
-    // { TWINKLE_STARS,                  period,  density,    0,        0,            0,          0,            palette,  palette_i,  palette_j },
-    // { ROTATE_BANDS,                   period,  period,  num_bands,  0,        0,            0,          0,            palette,  palette_i,  palette_j },
-    // { RATS_IN_A_CAGE,                 period,  spacer,     jitter,   prob,         hop,        tail_length,  palette,  palette_i,  palette_j },
-    // { SNOWFALL,                       period,  fall_speed, spacer,   jitter,       0,          0,            palette,  palette_i,  palette_j},
-    // { FAKE_SPECTRA,                   period,  speed_lo,   speed_hi, extent_lo,    extent_hi,  0,            palette,  palette_i,  palette_j },
-    // { TRIGGER_LEVELS_DOWN,            period,  speed,      0,        0,            0,          0,            palette,  palette_i,  palette_j },
-    // { TRIGGER_LEVELS_UP,              period,  speed,      0,        0,            0,          0,            palette,  palette_i,  palette_j },
-    // { LOOP_LEVELS_SWEEP_DOWN_INIT,    period,  speed,      offset,   0,            0,          0,            palette,  palette_i,  palette_j },
-    // { LOOP_LEVELS_SWEEP_UP_INIT,      period,  speed,      offset,   0,            0,          0,            palette,  palette_i,  palette_j },
-    // { LOOP_LEVELS_FADE_DOWN_INIT,     period,  speed,      offset,   pulse_speed,  0,          0,            palette,  palette_i,  palette_j },
-    // { LOOP_LEVELS_FADE_UP_INIT,       period,  speed,      offset,   pulse_speed,  0,          0,            palette,  palette_i,  palette_j },
-    // { SPIRAL_LEVELS_SWEEP_DOWN_INIT,  period,  speed,      offset,   0,            0,          0,            palette,  palette_i,  palette_j },
-    // { SPIRAL_LEVELS_SWEEP_UP_INIT,    period,  speed,      offset,   0,            0,          0,            palette,  palette_i,  palette_j }
+    // { DARK,                           period,  0,          0,          0,            0,            0,            0,        0,          0 },                     // 
+    // { TEST_CHASERS,                   period,  0,          0,          0,            0,            0,            0,        0,          0 },
+    // { LIGHT_SIDES,                    period,  speed,                                                          palette,  palette_i,  palette_j },
+    // { TWINKLE_STARS,                  period,  density,    speed_lo,   speed_hi,     0,            0,            palette,  palette_i,  palette_j },
+    // { ROTATE_BANDS,                   period,  period,     num_bands,  0,            0,            0,          0,            palette,  palette_i,  palette_j },
+    // { RATS_IN_A_CAGE,                 period,  spacer,     jitter,     prob,         hop,          tail_length,  palette,  palette_i,  palette_j },
+    // { SNOWFALL,                       period,  fall_speed, spacer,     jitter,       restart_prob, 0,            palette,  palette_i,  palette_j},
+    // { FAKE_SPECTRA,                   period,  speed_lo,   speed_hi,   extent_lo,    extent_hi,    0,            palette,  palette_i,  palette_j },
+    // { TRIGGER_LEVELS_DOWN,            period,  speed,      0,          0,            0,            0,            palette,  palette_i,  palette_j },
+    // { TRIGGER_LEVELS_UP,              period,  speed,      0,          0,            0,            0,            palette,  palette_i,  palette_j },
+    // { LOOP_LEVELS_SWEEP_DOWN_INIT,    period,  speed,      offset,     0,            0,            0,            palette,  palette_i,  palette_j },
+    // { LOOP_LEVELS_SWEEP_UP_INIT,      period,  speed,      offset,     0,            0,            0,            palette,  palette_i,  palette_j },
+    // { LOOP_LEVELS_FADE_DOWN_INIT,     period,  speed,      offset,     pulse_speed,  0,            0,            palette,  palette_i,  palette_j },
+    // { LOOP_LEVELS_FADE_UP_INIT,       period,  speed,      offset,     pulse_speed,  0,            0,            palette,  palette_i,  palette_j },
+    // { SPIRAL_LEVELS_SWEEP_DOWN_INIT,  period,  speed,      offset,     0,            0,            0,            palette,  palette_i,  palette_j },
+    // { SPIRAL_LEVELS_SWEEP_UP_INIT,    period,  speed,      offset,     0,            0,            0,            palette,  palette_i,  palette_j }
 
     // Above is a guide
     // Defaults:
@@ -35,7 +35,7 @@ int PRESETS[NUM_PRESETS][7] = {
     
     { LIGHT_SIDES,                    50,     1,          0,        0,            0,          0 },    //             palette,  palette_i,  palette_j },
     
-    { TWINKLE_STARS,                  50,     100,        0,        0,            0,          0 },    //,            palette,  palette_i,  palette_j },  // density /= 1000
+    { TWINKLE_STARS,                  50,     100,        3,        23,            0,          0 },    //,            palette,  palette_i,  palette_j },  // density /= 1000
     
     { ROTATE_BANDS,                   50,     4,          0,        0,            0,          0 },    //,            palette,  palette_i,  palette_j },  
     

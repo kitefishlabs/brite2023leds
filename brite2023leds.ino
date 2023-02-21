@@ -28,13 +28,13 @@
 
 
 //int _mode = TEST_CHASERS;
-int _mode = 14; // default = off
+int _mode = ROTATE_BANDS; // default = off
 int __mode = _mode;
 
 int chosen_preset[7];
 int last_preset_ms = millis(); // MS
 
-int __param1 = 50;
+int __param1 = 10;
 int __param2 = 0;
 int __param3 = 0;
 int __param4 = 0;
@@ -243,18 +243,18 @@ void setup() {
 
 void loop() {
 
-  if ((millis() - last_preset_ms) > 5000) {
-    int choice = presets.get_weighted_random_preset();
-    int* chosen_preset = PRESETS[choice];
-//    Serial.println((int)chosen_preset[0]);
-    __mode = (int)chosen_preset[0];
-    __param1 = (int)chosen_preset[1];
-    __param2 = (int)chosen_preset[2];
-    __param3 = (int)chosen_preset[3];
-    __param4 = (int)chosen_preset[4];
-    __param5 = (int)chosen_preset[5];
-    last_preset_ms = millis();
-  }
+//  if ((millis() - last_preset_ms) > 10000) {
+//    int choice = presets.get_weighted_random_preset();
+//    int* chosen_preset = PRESETS[choice];
+////    Serial.println((int)chosen_preset[0]);
+//    __mode = (int)chosen_preset[0];
+//    __param1 = (int)chosen_preset[1];
+//    __param2 = (int)chosen_preset[2];
+//    __param3 = (int)chosen_preset[3];
+//    __param4 = (int)chosen_preset[4];
+//    __param5 = (int)chosen_preset[5];
+//    last_preset_ms = millis();
+//  }
   
   if (__mode != _mode) {
     Serial.print("Mode changed from "); Serial.print(_mode); Serial.print(" to: "); Serial.println(__mode);
@@ -337,7 +337,7 @@ void loop() {
       clear_leds();
 
       // up is down, down is up, peace is war
-      triggerLevels.update_model(-1);
+      triggerLevels.update_model(1);
       triggerLevels.loop();
     }
 
@@ -346,7 +346,7 @@ void loop() {
    if ((millis() % __param1) < 10) {
      clear_leds();
      
-     triggerLevels.update_model(1);
+     triggerLevels.update_model(-1);
      triggerLevels.loop();
    }
 
