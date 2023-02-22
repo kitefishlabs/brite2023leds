@@ -17,13 +17,14 @@ private:
   CRGB currentRGB_ = CRGB(0,0,0);
   uint8_t currentLevel_;
   uint8_t currentSide_;
-  int speed_;
   int counter_;
   uint8_t subMode_;
-  int offset_;
   int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
+  int speed_;
+  int offset_;
+  
   LEDsTriggerLevelSweep(I2SClocklessLedDriver *driver) {
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);

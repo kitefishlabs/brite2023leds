@@ -16,13 +16,14 @@ private:
   CHSV currentHSV_;                 // current HSV color for periodic sampling whenever the light-side function is called
   CRGB currentRGB_ = CRGB(0,0,0);
 //  uint8_t currentSide_;
-  int speed_;
   int counter_;
   uint8_t subMode_;
   int angle_;
-  int num_bands_;
   
 public:
+  int speed_;
+  int num_bands_;
+  
   LEDsRotateBands(I2SClocklessLedDriver *driver) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);
@@ -30,18 +31,18 @@ public:
     speed_ = 1;
     subMode_ = 2;
     angle_ = 0;
-    num_bands_ = 8;
+    num_bands_ = 11;
   };
 
   void init() {
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     this->angle_ = 0;
-    this->num_bands_ = 8;
+    this->num_bands_ = 11;
   };
 
   void draw_at_angle(int angle, CRGB currentRGB) {
-    for (int lvl=0; lvl<NUM_LEVELS; lvl++) {
+    for (int lvl=0; lvl<this->num_bands_; lvl++) {
       int side = 1 - int(angle / 180);
       int* octo = LEVELMAP[lvl][side];
 //      Serial.println("--");

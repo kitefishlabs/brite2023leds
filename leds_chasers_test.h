@@ -16,10 +16,12 @@ private:
   CHSV currentHue_;
   CRGB currentRGB_;
   int index;
-  int prob;
+  
   int strip;
 
 public:
+  int prob;
+  
   LEDsChasersTest(I2SClocklessLedDriver *driver) {
     driver_ = driver;
     // currentHue_ = CHSV(0,0,0);

@@ -15,10 +15,11 @@ private:
   I2SClocklessLedDriver* driver_;
   CHSV currentHSV_;                 // current HSV color for periodic sampling whenever the light-side function is called
   CRGB currentRGB_;                 // standard temp color var conversion destination
-  int speed_;                       // speed of evolution of HSV color
   int currentSide_;                 // track which side we are on
 
 public:
+  int speed_;                       // speed of evolution of HSV color
+
   LEDsLightSide(I2SClocklessLedDriver *driver) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);

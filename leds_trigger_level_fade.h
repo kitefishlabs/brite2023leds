@@ -17,14 +17,15 @@ private:
   CRGB currentRGB_ = CRGB(0,0,0);
   uint8_t currentLevel_;
   uint8_t currentSide_;
-  int pulse_speed_;
-  int speed__;
   int counter_;
   uint8_t subMode_;
-  int offset_;
   int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
+  int speed_;
+  int offset_;
+  int pulse_speed_;
+  
   LEDsTriggerLevelFade(I2SClocklessLedDriver *driver) {
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);
@@ -32,7 +33,7 @@ public:
     currentLevel_ = 0;
     currentSide_ = 0;
     pulse_speed_ = 1;
-    speed__ = 1;
+    speed_ = 1;
     counter_ = 0;
     subMode_ = 2;
     offset_ = 40;
@@ -42,7 +43,7 @@ public:
   };
 
   void init(int dir) {
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed__,0,255), beatsin8(5*this->speed__,120,240), 0);
+    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), 0);
     
     if (dir > 0) {
       this->currentLevel_ = 0;  
@@ -52,7 +53,7 @@ public:
     
     this->currentSide_ = 0;
     this->pulse_speed_ = 5;
-    this->speed__ = 2;
+    this->speed_ = 2;
     this->counter_ = 0;
     this->subMode_ = 2;
     this->offset_ = 25;
@@ -98,7 +99,7 @@ public:
       }
     }
     
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed__,0,255), beatsin8(5*this->speed__,120,240), 0);
+    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), 0);
 
     
 //    Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 

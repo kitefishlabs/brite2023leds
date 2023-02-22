@@ -17,15 +17,16 @@ private:
   CRGB currentRGB_ = CRGB(0,0,0);
   uint8_t *leds_state_;   // 1 if active, 0 otherwise
   bool *dirty_state_;     // true per led if a swap was performed
+  bool dirty_;
+  
+public:
   int speed_;
   int spacer_;      // control distribution of leaders
   int jitter_;      // control spread/randomness of leaders
   int prob_;        // prob of moving on step
   int hop_;         // highest possible move
   int tail_length_;
-  bool dirty_;
   
-public:
   LEDsRatsInACage(I2SClocklessLedDriver *driver, uint8_t *states, bool *dirty_states) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);

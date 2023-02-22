@@ -19,12 +19,13 @@ private:
   uint8_t lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   uint8_t speeds_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   uint8_t extents_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  
+public:
   int speed_lo_;
   int speed_hi_;
   int extent_lo_;
   int extent_hi_;
   
-public:
   LEDsFakeSpectra(I2SClocklessLedDriver *driver) {
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);
@@ -45,26 +46,26 @@ public:
 
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
-
+    delay(1000);
+    Serial.println("---------->>>>");
     this->speed_ = 1;
     for (int ll=0; ll<NUM_LEVELS; ll++) {
       this->lvls_[ll] = 0;
-      this->speeds_[ll] = random8(this->speed_lo_,this->speed_hi_);
-      this->extents_[ll] = random8(this->extent_lo_,this->extent_hi_);
+      this->speeds_[ll] = 55; //random8(this->speed_hi_);
+      Serial.println(this->speeds_[ll]);
+      this->extents_[ll] = random8();
     }
-  }
-
-  void setup() {
-    this->init();
   };
 
   void update_model() {
     
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
-
+    Serial.println("----------");
     for (int ll=0; ll<NUM_LEVELS; ll++) {
-      this->lvls_[ll] = beatsin8(this->speeds_[ll], 0, this->extents_[ll]);
+      this->lvls_[ll] = beatsin8(this->speeds_[ll], 2, this->extents_[ll]);
+      Serial.println(this->speeds_[ll]);
+      Serial.println(this->lvls_[ll]);
     }
     
   };
@@ -92,7 +93,7 @@ public:
             }
 
             for (int j=val; j<(start+(d*l)); j++) {
-              this->driver_->setPixel(j, 0, 0, 0);
+              this->driver_->setPixel(j, 128, 128, 128);
             }
             
       
@@ -105,7 +106,7 @@ public:
             }
 
             for (int j=val; j>=(start+(d*l)); j--) {
-              this->driver_->setPixel(j, 0, 0, 0);
+              this->driver_->setPixel(j, 128, 128, 128);
             }
   
           }

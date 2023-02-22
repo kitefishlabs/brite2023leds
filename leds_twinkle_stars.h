@@ -19,11 +19,12 @@ private:
 //  int currentSide_;                 // track which side we are on
   uint8_t *leds_state_;
   uint8_t *leds_speed_state_;
+
+public:
   int density_;
   int speed_lo_;
   int speed_hi_;
-
-public:
+  
   LEDsTwinkleStars(I2SClocklessLedDriver *driver, uint8_t *states, uint8_t *speeds ) {
     driver_ = driver;
     currentHSV_ = CHSV(BLUE,200,240);

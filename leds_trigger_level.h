@@ -17,10 +17,11 @@ private:
   CRGB currentRGB_;
   uint8_t currentLevel_;
   uint8_t currentSide_;
-  int speed_;
   uint8_t subMode_;
 
 public:
+  int speed_;
+
   LEDsTriggerLevel(I2SClocklessLedDriver *driver) {
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);

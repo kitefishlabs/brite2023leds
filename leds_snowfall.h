@@ -16,13 +16,14 @@ private:
   CHSV currentHSV_;                 // current HSV color for periodic sampling whenever the light-side function is called
   CRGB currentRGB_ = CRGB(0,0,0);
   float *angle_state_;
+  
+public:
   int speed_;
   int fall_speed_;
   int spacer_;
   int jitter_;
   int restart_prob_;
-  
-public:
+
   LEDsSnowfall(I2SClocklessLedDriver *driver, float *angle_state) {
     driver_ = driver;
     currentHSV_ = CHSV(0,0,0);
