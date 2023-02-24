@@ -18,7 +18,7 @@ private:
   uint8_t currentLevel_;
   uint8_t currentSide_;
   int counter_;
-  uint8_t subMode_;
+  uint8_t mirror_;
   int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
@@ -34,7 +34,7 @@ public:
     currentSide_ = 0;
     speed_ = 1;
     counter_ = 0;
-    subMode_ = 3;
+    mirror_ = 3;
     offset_ = 40;
   };
 
@@ -51,7 +51,7 @@ public:
     this->currentSide_ = 0;
     this->speed_ = 1;
     this->counter_ = 0;
-    this->subMode_ = 3;
+    this->mirror_ = 3;
     this->offset_ = 40;
     for (int i=0; i<NUM_LEVELS; i++) {
       this->lvls_[i] = 0;
@@ -80,12 +80,12 @@ public:
 //      Serial.println(this->lvls_[i]);
 //    }
 
-    Serial.println(">>>>>");
-    Serial.println(this->currentLevel_);
-    Serial.println(this->currentSide_);
-    Serial.println(((this->currentSide_ * NUM_LEVELS) + this->currentLevel_));
-    Serial.println(PW[((this->currentSide_ * NUM_LEVELS) + this->currentLevel_)]);
-    Serial.println(this->counter_);
+    // Serial.println(">>>>>");
+    // Serial.println(this->currentLevel_);
+    // Serial.println(this->currentSide_);
+    // Serial.println(((this->currentSide_ * NUM_LEVELS) + this->currentLevel_));
+    // Serial.println(PW[((this->currentSide_ * NUM_LEVELS) + this->currentLevel_)]);
+    // Serial.println(this->counter_);
     
     if (this->counter_ >= PW[((this->currentSide_ * NUM_LEVELS) + this->currentLevel_)]) {
       
@@ -95,32 +95,34 @@ public:
       this->currentSide_ = 1 - this->currentSide_;
       if (this->currentSide_ == 0) {
         this->currentLevel_ = (this->currentLevel_ + dir + NUM_LEVELS) % NUM_LEVELS;
-        Serial.println("current");
-        Serial.println(this->currentLevel_);
-        Serial.println(this->currentSide_);
+        // Serial.println("current");
+        // Serial.println(this->currentLevel_);
+        // Serial.println(this->currentSide_);
       }
       this->lvls_[this->currentLevel_] = 1;
     
     } else {
       this->counter_ += 1;
-//      if ((this->subMode_ == 2) && (this->currentSide_ == 1)) {
+//      if ((this->mirror_ == 2) && (this->currentSide_ == 1)) {
 //        this->lvls_[this->currentLevel_] += 1;
 //      }
     }
     
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
-    Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
-    Serial.println(this->currentSide_);
-    Serial.println(this->currentLevel_);
-    Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
+
+    // Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
+    // Serial.println(this->currentSide_);
+    // Serial.println(this->currentLevel_);
+    // Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
   };
 
   void light_level() {
 
-    Serial.print("lvl: "); Serial.println(this->currentLevel_);
+    // Serial.print("lvl: "); Serial.println(this->currentLevel_);
     for (int ll = 0; ll < NUM_LEVELS; ll++) {
-      Serial.print("LL: "); Serial.println(ll);  
+
+      // Serial.print("LL: "); Serial.println(ll);  
       if (this->lvls_[ll] > 0) {
         
         int r = LEVELS[ll][this->currentSide_][0];
@@ -134,6 +136,7 @@ public:
         
           int j = start + this->lvls_[ll];
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
+
 //          if (j >= start+(d*l)) {
 //            this->lvls_[ll] = 0;
 //            Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
@@ -145,6 +148,7 @@ public:
         
           int j = start - 1 - this->lvls_[ll];
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
+
 //          if (j <= (start+(d*l))) {
 //            this->lvls_[ll] = 0;
 //            Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
@@ -158,29 +162,30 @@ public:
   
   void loop() {
     
-    if (this->subMode_ == 0) {
+    if (this->mirror_ == 0) {
     
       this->currentSide_ = 0;
       this->light_level();
     
-    } else if (this->subMode_ == 1) {
+    } else if (this->mirror_ == 1) {
 
       this->currentSide_ = 1;
       this->light_level();
     
-    } else if (this->subMode_ == 2) {
+    } else if (this->mirror_ == 2) {
       
       for (int i=0; i<2; i++) {
         this->currentSide_ = i;
         this->light_level();
       }
 
-    } else if (this->subMode_ == 3) {
-//      this->currentSide_ = 1 - this->currentSide_;
-      this->light_level();
+    } else if (this->mirror_ == 3) {
+
+      this->light_level();    
     }
-//    this->counter_ = (this->counter_ + 1) % 10000;
+
     this->driver_->showPixels();
+
   };
 
 };

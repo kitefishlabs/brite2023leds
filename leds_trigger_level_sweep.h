@@ -18,7 +18,7 @@ private:
   uint8_t currentLevel_;
   uint8_t currentSide_;
   int counter_;
-  uint8_t subMode_;
+  uint8_t mirror_;
   int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
@@ -33,11 +33,8 @@ public:
     currentSide_ = 0;
     speed_ = 1;
     counter_ = 0;
-    subMode_ = 3;
+    mirror_ = 3;
     offset_ = 40;
-//    for (int i=0; i<NUM_LEVELS; i++) {
-//      lvls_[i] = 0;
-//    }
   };
 
   void init(int dir) {
@@ -47,27 +44,22 @@ public:
     if (dir > 0) {
       this->currentLevel_ = 0;  
     } else {
-      this->currentLevel_ = 0;  
+      this->currentLevel_ = NUM_LEVELS - 1;  
     }
     
     this->currentSide_ = 0;
     this->speed_ = 1;
     this->counter_ = 0;
-    this->subMode_ = 3;
+    this->mirror_ = 3;
     this->offset_ = 40;
     for (int i=0; i<NUM_LEVELS; i++) {
       this->lvls_[i] = 0;
     }
-    Serial.println("INIT");
-    for (int i=0; i<NUM_LEVELS; i++) {
-      Serial.println(this->lvls_[i]);
-    }
+    // Serial.println("INIT");
+    // for (int i=0; i<NUM_LEVELS; i++) {
+    //   Serial.println(this->lvls_[i]);
+    // }
   }
-
-  void setup() {
-    this->init(1);
-  };
-
 
   void update_model(int dir) {
     // update model is called at the start of each main loop func call
@@ -84,59 +76,66 @@ public:
 
     if (((this->counter_ % this->offset_) == 0) && (this->lvls_[this->currentLevel_] == 0)) {
       
-      Serial.print("LVL: ");  Serial.println(this->currentLevel_);
+      // Serial.print("LVL: ");  Serial.println(this->currentLevel_);
 //      if (this->currentLevel_ == 0) {
 //        this->currentSide_ = 1 - this->currentSide_;
 //        Serial.print("lvl == 0 detected sd="); Serial.println(this->currentSide_);
 //      }
       this->lvls_[this->currentLevel_] = 1;
-      if ((this->currentLevel_ + dir) < 0) {
-        this->currentLevel_ = 10;
-      } else {
-        this->currentLevel_ = (this->currentLevel_ + dir) % NUM_LEVELS;
-      }
+      this->currentLevel_ = (this->currentLevel_ + dir + NUM_LEVELS) % NUM_LEVELS;
+    
     }
     
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
-    Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
-    Serial.println(this->currentSide_);
-    Serial.println(this->currentLevel_);
-    Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
+    
+    // Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
+    // Serial.println(this->currentSide_);
+    // Serial.println(this->currentLevel_);
+    // Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
   };
 
   void light_level() {
 
-    Serial.print("lvl: "); Serial.println(this->currentLevel_);
+    int r = 0;
+    int o = 0;
+    int l = 0;
+    int d = 0;
+    int lt = 0;
+    int start = 0;
+    int j = 0;
+  
+    // Serial.print("lvl: "); Serial.println(this->currentLevel_);
     for (int ll = 0; ll < NUM_LEVELS; ll++) {
-      Serial.print("LL: "); Serial.println(ll);  
+      // Serial.print("LL: "); Serial.println(ll);  
       if (this->lvls_[ll] > 0) {
         
-        int r = LEVELS[ll][this->currentSide_][0];
-        int o = LEVELS[ll][this->currentSide_][1];
-        int l = LEVELS[ll][this->currentSide_][2];
-        int d = LEVELS[ll][this->currentSide_][3];
-        int lt = LEVELS[ll][this->currentSide_][4];
-        int start = (r * NUM_LEDS_PER_STRIP) + o;
+        r = LEVELS[ll][this->currentSide_][0];
+        o = LEVELS[ll][this->currentSide_][1];
+        l = LEVELS[ll][this->currentSide_][2];
+        d = LEVELS[ll][this->currentSide_][3];
+        lt = LEVELS[ll][this->currentSide_][4];
+        start = (r * NUM_LEDS_PER_STRIP) + o;
         
         if (d>0) {
         
-          int j = start + this->lvls_[ll];
+          j = start + this->lvls_[ll];
+
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
           if (j >= start+(d*l)) {
             this->lvls_[ll] = 0;
-            Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
+            // Serial.print("LL----------------------------->0 (++) "); Serial.println(ll);
           } else {
             this->lvls_[ll] = (this->lvls_[ll] + 1);
           }
         
         } else {
         
-          int j = start - 1 - this->lvls_[ll];
+          j = start - 1 - this->lvls_[ll];
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
           if (j <= (start+(d*l))) {
             this->lvls_[ll] = 0;
-            Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
+            // Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
           } else {
             this->lvls_[ll] = (this->lvls_[ll] + 1);
           }
@@ -147,24 +146,24 @@ public:
   
   void loop() {
     
-    if (this->subMode_ == 0) {
+    if (this->mirror_ == 0) {
     
       this->currentSide_ = 0;
       this->light_level();
     
-    } else if (this->subMode_ == 1) {
+    } else if (this->mirror_ == 1) {
 
       this->currentSide_ = 1;
       this->light_level();
     
-    } else if (this->subMode_ == 2) {
+    } else if (this->mirror_ == 2) {
       
       for (int i=0; i<2; i++) {
         this->currentSide_ = i;
         this->light_level();
       }
 
-    } else if (this->subMode_ == 3) {
+    } else if (this->mirror_ == 3) {
       this->currentSide_ = 1 - this->currentSide_;
       this->light_level();
     }
@@ -175,62 +174,3 @@ public:
 };
 
 #endif
-
-// //void trigger_level_sweep(int dir) {
-// //
-// //  CRGB temp = CRGB(0, 0, 0);
-// //  example_blue = CHSV(beatsin8(3*speed,0,255), beatsin8(5*speed,120,240), beatsin8(7*speed,48,200));
-// //  hsv2rgb_rainbow( example_blue, temp);
-// //
-// ////  Serial.print(example_blue.hue); Serial.print(" "); Serial.print(example_blue.saturation); Serial.print(" "); Serial.println(example_blue.value); Serial.print(" "); Serial.println(sd);
-// //
-// ////  every tenth tick, look ahead to see if next level is zeroed out (if not zeroed out, we wait)
-// //  Serial.print("counter = "); Serial.print(counter); Serial.print(" "); Serial.println(((lvl+1)%NUM_LEVELS));
-// //  if (((counter % 10) == 0) && (lvls[((lvl+1)%NUM_LEVELS)] == 0)) {
-// //    lvl = (lvl + dir) % NUM_LEVELS;
-// //    if (lvl == 0) {
-// //      sd = 1 - sd;
-// //      Serial.print("lvl == 0 detected sd="); Serial.println(sd);
-// //    }
-// //    Serial.print("LVL: ");  Serial.println(lvl);
-// //    lvls[lvl] = 1;
-// //  }
-// //  Serial.print("lvl: ");  Serial.println(lvl);
-// //  for (int ll = 0; ll < NUM_LEVELS; ll++) {
-// //    Serial.println(ll);  
-// //    if (lvls[ll] >= 0) {
-// //      
-// //      int r = sides[sd][ll][0];
-// //      int o = sides[sd][ll][1];
-// //      int l = sides[sd][ll][2];
-// //      int d = sides[sd][ll][3];
-// //      int lt = sides[sd][ll][4];
-// //      int start = (r * 400) + o;
-// //      
-// //      if (d>0) {
-// //      
-// //        int j = start + lvls[ll];
-// //        driver->setPixel(j, temp.r, temp.g, temp.b);
-// //        if (j >= start+(d*l)) {
-// //          lvls[ll] = 0;
-// //          Serial.print("LL----------------------------->0 (++) "); Serial.println(ll); 
-// //        } else {
-// //          lvls[ll] = lvls[ll] + 1;
-// //        }
-// //      
-// //      } else {
-// //      
-// //        int j = start - 1 - lvls[ll];
-// //        driver->setPixel(j, temp.r, temp.g, temp.b);
-// //        if (j <= (start+(d*l))) {
-// //          lvls[ll] = 0;
-// //          Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
-// //        } else {
-// //          lvls[ll] = lvls[ll] + 1;
-// //        }
-// //      }
-// //    }
-// //  }
-// //  counter = (counter + 1) % 10000;
-// ////  delay(2);
-// //}

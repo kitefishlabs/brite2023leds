@@ -16,6 +16,8 @@ private:
   CHSV currentHSV_;                 // current HSV color for periodic sampling whenever the light-side function is called
   CRGB currentRGB_;                 // standard temp color var conversion destination
   int currentSide_;                 // track which side we are on
+  uint8_t mirror_;
+
 
 public:
   int speed_;                       // speed of evolution of HSV color
@@ -26,25 +28,25 @@ public:
     currentRGB_ = CRGB(0,0,0);
     speed_ = 1;
     currentSide_ = 0;
+    mirror_ = 3;
   };
 
   void init() {
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
-    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
-    this->currentSide_ = 0;
-  }
+//    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+//    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
 
-  void setup() {
-    this->init();
+//    this->currentRGB_ = ColorFromPalette( paletteCtl.currentPalette_, 1, 128, paletteCtl.currentBlending_);
+
+    this->currentSide_ = 0;
   };
 
-  void update_model() {
+  void update_model(LEDsPaletteController paletteCtl, int index) {
     // update model is called at the start of each main loop func call
-    // calling rgb func here should cause rainbowish randomish effect
+    // calling rgb func that changes here should cause rainbowish randomish effect
     // call it at the change of the side var to update color in sync with side changes
+    //    Serial.print("index: "); Serial.print(index); Serial.print(", R: "); Serial.print(this->currentRGB_.r); Serial.print(", G: "); Serial.print(this->currentRGB_.g); Serial.print(", B: "); Serial.println(this->currentRGB_.b);
     
-    this->currentSide_  = 1 - this->currentSide_;
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+    this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, index, 128, paletteCtl.currentBlending_);
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
 
 //     Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
@@ -52,20 +54,24 @@ public:
 //     Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
   };
 
-  void loop() {
-    
-    // light-sides is a one-shot, so this loop is executed once when the whole side updates.
-    // one-shot effects allow us to use conventional for-loops in the effect's loop() function
-    
+
+  void light_side() {
+
+    int r = 0;
+    int o = 0;
+    int l = 0;
+    int d = 0;
+    int lt = 0;
+    int start = 0;
+
     for (int i=0; i<NUM_LEVELS; i++) {
       
-      int r = SIDES[this->currentSide_][i][0];
-      int o = SIDES[this->currentSide_][i][1];
-      int l = SIDES[this->currentSide_][i][2];
-      int d = SIDES[this->currentSide_][i][3];
-      int lt = SIDES[this->currentSide_][i][4];
-      
-      int start = (r * NUM_LEDS_PER_STRIP) + o;
+      r = SIDES[this->currentSide_][i][0];
+      o = SIDES[this->currentSide_][i][1];
+      l = SIDES[this->currentSide_][i][2];
+      d = SIDES[this->currentSide_][i][3];
+      lt = SIDES[this->currentSide_][i][4];
+      start = (r * NUM_LEDS_PER_STRIP) + o;
       
       if (d > 0) {
 
@@ -84,7 +90,38 @@ public:
         }
       }
     }
-    this->driver_->showPixels(); 
-  }
+    this->driver_->showPixels();
+  };
+
+  void loop() {
+    
+    // light-sides is a one-shot, so this loop is executed once when the whole side updates.
+    // one-shot effects allow us to use conventional for-loops in the effect's loop() function
+    
+    if (this->mirror_ == 0) {
+    
+      this->currentSide_ = 0;
+      this->light_side();
+    
+    } else if (this->mirror_ == 1) {
+
+      this->currentSide_ = 1;
+      this->light_side();
+    
+    } else if (this->mirror_ == 2) {
+      
+      for (int i=0; i<2; i++) {
+        this->currentSide_ = i;
+        this->light_side();
+      }
+
+    } else if (this->mirror_ == 3) {
+      this->currentSide_ = 1 - this->currentSide_;
+      this->light_side();
+    }
+    
+    this->driver_->showPixels();
+  };
+
 };
 #endif

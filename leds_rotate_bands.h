@@ -17,7 +17,7 @@ private:
   CRGB currentRGB_ = CRGB(0,0,0);
 //  uint8_t currentSide_;
   int counter_;
-  uint8_t subMode_;
+  uint8_t mirror_;
   int angle_;
   
 public:
@@ -29,7 +29,7 @@ public:
     currentHSV_ = CHSV(0,0,0);
     currentRGB_ = CRGB(0,0,0);
     speed_ = 1;
-    subMode_ = 2;
+    mirror_ = 2;
     angle_ = 0;
     num_bands_ = 11;
   };
@@ -42,7 +42,7 @@ public:
   };
 
   void draw_at_angle(int angle, CRGB currentRGB) {
-    for (int lvl=0; lvl<this->num_bands_; lvl++) {
+    for (int lvl=0; lvl<NUM_LEVELS; lvl++) {
       int side = 1 - int(angle / 180);
       int* octo = LEVELMAP[lvl][side];
 //      Serial.println("--");

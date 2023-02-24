@@ -1,3 +1,4 @@
+
 #include <FastLED.h>
 #include "I2SClocklessLedDriver.h"
 #include "FastLED_RGBW.h"
@@ -9,17 +10,6 @@
 #include <OSCBundle.h>  /// https://github.com/CNMAT/OSC
 
 /* c/o Rui Santos, Complete Project Details http://randomnerdtutorials.com */
-
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <WebServer.h>
-#include <ESPmDNS.h>
-#include <Update.h>
-#include "webserver.h"
-
-const char* host = "esp32";
-const char* ssid = "NETGEAR63-5G";
-const char* password = "oddlake062";
 
 #include "leds_chasers_test.h"
 #include "leds_twinkle_stars.h"
@@ -33,21 +23,23 @@ const char* password = "oddlake062";
 #include "leds_spiral_level_sweep.h"
 #include "leds_trigger_level_sweep.h"
 
+#include "leds_top_top.h"
+
 #include "runner.h"
 
-//#define SINGLE_MODE
+// These defines will increase the binary size and unlock the 2 networking possibilities.
 //#define ETHERNET_ACTIVE
-//#define WIFI_ACTIVE
+
+//#define SINGLE_MODE
+
 #define FULL_DMA_BUFFER
 
-WebServer server(80);
-
-//int _mode = TEST_CHASERS;
-int _mode = LIGHT_SIDES; // default = off
-
+// - INITIAL MODE
+int _mode = TEST_CHASERS;
+//int _mode = LIGHT_SIDES; // default = off
 int __mode = _mode;
 
-int chosen_preset[7];
+int chosen_preset[8];
 int last_preset_ms = millis(); // MS
 int current_preset_dur_ms = 10000;
 
@@ -66,8 +58,7 @@ I2SClocklessLedDriver *driver = new I2SClocklessLedDriver();
 
 // PINS
 // 8 total pins in the full setup
-int pins[NUMSTRIPS] = {4, 2, 13, 12, 15, 14, 32}; //,32};
-//int pins[NUMSTRIPS]={2,12,14,32, 4,13,15};
+int pins[NUMSTRIPS] = {4, 2, 13, 12, 15, 14, 32, 33};
 
 // LEDs and states
 CRGBW leds[NUM_COLOR_CHANNELS * TOTAL_LEDS];
@@ -84,7 +75,6 @@ AsyncUDP udp;
 
 static bool eth_connected = false;
 
-CHSV default_color = CHSV(0, 255, 128);
 CHSV currentHue = CHSV(0, 0, 0);
 CRGB currentRGB = CRGB::Black;
 
@@ -101,6 +91,10 @@ LEDsTriggerLevel triggerLevels = LEDsTriggerLevel(driver);
 LEDsSpiralLevelSweep spiralLevelSweeps = LEDsSpiralLevelSweep(driver);
 LEDsTriggerLevelSweep triggerLevelSweeps = LEDsTriggerLevelSweep(driver);
 LEDsTriggerLevelFade triggerLevelFades = LEDsTriggerLevelFade(driver);
+
+LEDsTopTop triggerTopTop = LEDsTopTop(driver);
+
+LEDsPaletteController paletteCtl = LEDsPaletteController();
 
 // OSC Callback Functions (if necessary)
 
@@ -172,68 +166,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Serial - initialize");
 
-#ifdef WIFI_ACTIVE
-
-// Connect to WiFi network
-  WiFi.begin(ssid, password);
-  Serial.println("");
-
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  /*use mdns for host name resolution*/
-  if (!MDNS.begin(host)) { //http://esp32.local
-    Serial.println("Error setting up MDNS responder!");
-    while (1) {
-      delay(1000);
-    }
-  }
-  Serial.println("mDNS responder started");
-  /*return index page which is stored in serverIndex */
-  server.on("/", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", loginIndex);
-  });
-  server.on("/serverIndex", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", serverIndex);
-  });
-  /*handling uploading firmware file */
-  server.on("/update", HTTP_POST, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
-    ESP.restart();
-  }, []() {
-    HTTPUpload& upload = server.upload();
-    if (upload.status == UPLOAD_FILE_START) {
-      Serial.printf("Update: %s\n", upload.filename.c_str());
-      if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
-        Update.printError(Serial);
-      }
-    } else if (upload.status == UPLOAD_FILE_WRITE) {
-      /* flashing firmware to ESP*/
-      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-        Update.printError(Serial);
-      }
-    } else if (upload.status == UPLOAD_FILE_END) {
-      if (Update.end(true)) { //true to set the size to the current progress
-        Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
-      } else {
-        Update.printError(Serial);
-      }
-    }
-  });
-  server.begin();
-#endif
-
 #ifdef ETHERNET_ACTIVE
   WiFi.onEvent(WiFiEvent);
   Serial.println("WiFi.onEvent");
@@ -289,6 +221,8 @@ void setup() {
   snowfall.init();
   fakeSpectra.init();
 
+  triggerTopTop.init();
+
   last_preset_ms = millis(); // MS
 
   Serial.println("END SETUP");
@@ -311,16 +245,26 @@ void loop() {
     __param4 = (int)chosen_preset[4];
     __param5 = (int)chosen_preset[5];
     __param6 = (int)chosen_preset[6];
-//    __param7 = (int)chosen_preset[7];
+    __param7 = (int)chosen_preset[7];
 #endif
     last_preset_ms = millis();
     current_preset_dur_ms = (random(10) + 2) * 2500; // 5 -> 30 seconds in 2.5 second increments
 
-    if       (_mode == TWINKLE_STARS)                   {
+    triggerTopTop.update_model(paletteCtl, __param7);
+    triggerTopTop.loop();
+
+    if       (_mode == LIGHT_SIDES)                   {
+      lightSides.init();
+      paletteCtl.chooseColorPalette(__param7);
+    }
+    
+    else if       (_mode == TWINKLE_STARS)                   {
       twinkleStars.init();
       twinkleStars.density_ = __param2;
       twinkleStars.speed_lo_ = __param3;
       twinkleStars.speed_hi_ = __param4;
+
+      paletteCtl.chooseColorPalette(__param7);
     }
 
     else if  (_mode == ROTATE_BANDS)                    {
@@ -333,12 +277,14 @@ void loop() {
 
     else if  (_mode == RATS_IN_A_CAGE)                  {
       ratsInACage.init();
-      ratsInACage.speed_ = __param2;
-      ratsInACage.spacer_ = __param3;
-      ratsInACage.jitter_ = __param4;
-      ratsInACage.prob_ = __param5;
-      ratsInACage.hop_ = __param6;
-//      ratsInACage.tail_length_ = __param7;
+//      ratsInACage.speed_ = __param2;
+      ratsInACage.spacer_ = __param2;
+      ratsInACage.jitter_ = __param3;
+      ratsInACage.prob_ = __param4;
+      ratsInACage.hop_ = __param5;
+      ratsInACage.tail_length_ = __param6;
+
+      paletteCtl.chooseColorPalette(__param7);
     }
 
     else if  (_mode == SNOWFALL)                        {
@@ -436,8 +382,7 @@ void loop() {
     if ((millis() % __param1) < 10) {
 
       clear_leds();
-
-      lightSides.update_model();
+      lightSides.update_model(paletteCtl, __param7);
       lightSides.loop();
 
     }
@@ -446,9 +391,7 @@ void loop() {
 
     if ((millis() % __param1) < 2) {
 
-      //      clear_leds();
-
-      twinkleStars.update_model();
+      twinkleStars.update_model(paletteCtl, __param7);
       twinkleStars.loop();
 
     }
@@ -459,7 +402,7 @@ void loop() {
 
       //      clear_leds();
 
-      ratsInACage.update_model();
+      ratsInACage.update_model(paletteCtl, __param7);
       ratsInACage.loop();
 
     }

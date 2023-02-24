@@ -31,10 +31,10 @@ public:
     currentHSV_ = CHSV(0,0,0);
     currentRGB_ = CRGB(0,0,0);
     speed_ = 1;
-    int speed_lo_ = 32;
-    int speed_hi_ = 156;
-    int extent_lo_ = 0;
-    int extent_hi_ = 256;
+    speed_lo_ = 32;
+    speed_hi_ = 156;
+    extent_lo_ = 0;
+    extent_hi_ = 256;
     for (int ll=0; ll<NUM_LEVELS; ll++) {
       lvls_[ll] = 0;
       speeds_[ll] = 0;
@@ -51,7 +51,7 @@ public:
     this->speed_ = 1;
     for (int ll=0; ll<NUM_LEVELS; ll++) {
       this->lvls_[ll] = 0;
-      this->speeds_[ll] = 55; //random8(this->speed_hi_);
+      this->speeds_[ll] = random8(this->speed_lo_, this->speed_hi_);
       Serial.println(this->speeds_[ll]);
       this->extents_[ll] = random8();
     }

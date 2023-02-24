@@ -18,7 +18,7 @@ private:
   uint8_t currentLevel_;
   uint8_t currentSide_;
   int counter_;
-  uint8_t subMode_;
+  uint8_t mirror_;
   int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
@@ -35,7 +35,7 @@ public:
     pulse_speed_ = 1;
     speed_ = 1;
     counter_ = 0;
-    subMode_ = 2;
+    mirror_ = 2;
     offset_ = 40;
     for (int i=0; i<NUM_LEVELS; i++) {
       lvls_[i] = 0;
@@ -55,7 +55,7 @@ public:
     this->pulse_speed_ = 5;
     this->speed_ = 2;
     this->counter_ = 0;
-    this->subMode_ = 2;
+    this->mirror_ = 2;
     this->offset_ = 25;
     for (int i=0; i<NUM_LEVELS; i++) {
       this->lvls_[i] = 0;
@@ -169,24 +169,24 @@ public:
   
   void loop() {
     
-    if (this->subMode_ == 0) {
+    if (this->mirror_ == 0) {
     
       this->currentSide_ = 0;
       this->light_level();
     
-    } else if (this->subMode_ == 1) {
+    } else if (this->mirror_ == 1) {
 
       this->currentSide_ = 1;
       this->light_level();
     
-    } else if (this->subMode_ == 2) {
+    } else if (this->mirror_ == 2) {
       
       for (int i=0; i<2; i++) {
         this->currentSide_ = i;
         this->light_level();
       }
 
-    } else if (this->subMode_ == 3) {
+    } else if (this->mirror_ == 3) {
       this->currentSide_ = 1 - this->currentSide_;
       this->light_level();
     }

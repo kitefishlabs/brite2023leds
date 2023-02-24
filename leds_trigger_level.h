@@ -17,7 +17,7 @@ private:
   CRGB currentRGB_;
   uint8_t currentLevel_;
   uint8_t currentSide_;
-  uint8_t subMode_;
+  uint8_t mirror_;
 
 public:
   int speed_;
@@ -29,21 +29,14 @@ public:
     currentLevel_ = 0;
     currentSide_ = 0;
     speed_ = 1;
-    subMode_ = 2;
+    mirror_ = 2;
   };
 
   void init() {
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
-    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     this->currentLevel_ = 0;
     this->currentSide_ = 0;
-    this->subMode_ = 2;
-  }
-
-  void setup() {
-    this->init();
+    this->mirror_ = 2;
   };
-
   
   void update_model(int dir) {
     // update model is called at the start of each main loop func call
@@ -96,32 +89,30 @@ public:
 
         this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
 //        Serial.print("NEGATIVE DIRECTION: "); Serial.print(" "); Serial.print(this->currentRGB_.r); Serial.print(" ");Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
-
       }
     }
-    
   };
 
   void loop() {
     
-    if (this->subMode_ == 0) {
+    if (this->mirror_ == 0) {
     
       this->currentSide_ = 0;
       this->light_level();
     
-    } else if (this->subMode_ == 1) {
+    } else if (this->mirror_ == 1) {
 
       this->currentSide_ = 1;
       this->light_level();
     
-    } else if (this->subMode_ == 2) {
+    } else if (this->mirror_ == 2) {
       
       for (int i=0; i<2; i++) {
         this->currentSide_ = i;
         this->light_level();
       }
 
-    } else if (this->subMode_ == 3) {
+    } else if (this->mirror_ == 3) {
       this->currentSide_ = 1 - this->currentSide_;
       this->light_level();
     }

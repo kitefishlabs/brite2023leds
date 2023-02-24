@@ -55,7 +55,7 @@ public:
     this->init();
   };
 
-  void update_model() {
+  void update_model(LEDsPaletteController paletteCtl, int index) {
     // update model is called at the start of each main loop func call
     // calling rgb func here should cause rainbowish randomish effect
     // call it at the change of the side var to update color in sync with side changes
@@ -68,6 +68,9 @@ public:
 ////        }
 //      }
 //    }
+
+    Serial.print("index: "); Serial.print(index); Serial.print(", R: "); Serial.print(this->currentRGB_.r); Serial.print(", G: "); Serial.print(this->currentRGB_.g); Serial.print(", B: "); Serial.println(this->currentRGB_.b);
+    this->currentRGB_ = ColorFromPalette( paletteCtl.currentPalette_, index, 64 + random8(64), paletteCtl.currentBlending_);
 
 //    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
 //    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
@@ -84,9 +87,6 @@ public:
     for (int i=0; i<TOTAL_LEDS; i++) {
       if (this->leds_state_[i] > 0) {
         this->leds_state_[i] = beatsin8(this->leds_speed_state_[i], 10, 240);
-//        if (i<30) {
-//          Serial.print(i); Serial.print(" "); Serial.print(leds_state_[i]); Serial.print(" "); Serial.println(leds_speed_state_[i]);
-//        }
         this->currentHSV_ = CHSV(this->currentHSV_.h , this->currentHSV_.s , this->leds_state_[i]);
         hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
         this->driver_->setPixel(i, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);

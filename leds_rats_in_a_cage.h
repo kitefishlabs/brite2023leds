@@ -38,7 +38,7 @@ public:
     spacer_ = 32;
     prob_ = 64;
     hop_ = 3;
-    tail_length_ = 3;
+    tail_length_ = 1;
     dirty_ = false;
   };
 
@@ -46,7 +46,7 @@ public:
     for (int i=0; i<TOTAL_LEDS; i++) { 
       this->dirty_state_[i] = false;
     }
-  }
+  };
 
   void init() {
     
@@ -66,26 +66,13 @@ public:
     }
   };
 
-  void setup() {
-    this->init();
-  };
+  void update_model(LEDsPaletteController paletteCtl, int index) { 
 
-
-//void seed_states_every_n(uint8_t states[], int num_states, int n=10, uint8_t valu=1, uint8_t jitter=0) {
-//  // Serial.print(num_states); Serial.print(" seed every N"); Serial.println(n);
-//  int rnd_offset = random(jitter) - (jitter/2);
-//  for (int i=0; i<num_states; i++) { 
-//    if ((i%n) == 0) {
-//      states[(i+rnd_offset)]=valu;
-//      rnd_offset = random(jitter) - (jitter/2);
-//    }
-//  }
-//}
-
-
-  void update_model() { 
-
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+    if (index < 8) {
+      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, index, 128, paletteCtl.currentBlending_);
+    } else {
+      this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+    }
 
     int ii = -1;  
 
