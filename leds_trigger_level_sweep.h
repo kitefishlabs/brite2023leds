@@ -24,6 +24,7 @@ private:
 public:
   int speed_;
   int offset_;
+  uint8_t hueSpeed_;
   
   LEDsTriggerLevelSweep(I2SClocklessLedDriver *driver) {
     driver_ = driver;
@@ -35,11 +36,10 @@ public:
     counter_ = 0;
     mirror_ = 3;
     offset_ = 40;
+    hueSpeed_ = 2;
   };
 
   void init(int dir) {
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
-    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     
     if (dir > 0) {
       this->currentLevel_ = 0;  
@@ -61,7 +61,7 @@ public:
     // }
   }
 
-  void update_model(int dir) {
+  void update_model(int dir, LEDsPaletteController paletteCtl, int index) {
     // update model is called at the start of each main loop func call
     // calling rgb func here should cause rainbowish randomish effect
     // call it at the change of the side var to update color in sync with side changes
@@ -83,11 +83,15 @@ public:
 //      }
       this->lvls_[this->currentLevel_] = 1;
       this->currentLevel_ = (this->currentLevel_ + dir + NUM_LEVELS) % NUM_LEVELS;
-    
     }
-    
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
-    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
+
+    if (index < 14) {
+      uint8_t hue_ = beatsin8(this->hueSpeed_, 0, 255);
+      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, hue_, 128, paletteCtl.currentBlending_);
+      this->currentHSV_ = CHSV(this->currentHSV_.h, MIN((this->currentHSV_.s + random8(8)), 255), this->currentHSV_.v);
+    } else {
+      this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+    }
     
     // Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
     // Serial.println(this->currentSide_);

@@ -26,6 +26,7 @@ public:
   int prob_;        // prob of moving on step
   int hop_;         // highest possible move
   int tail_length_;
+  int8_t hueSpeed_;
   
   LEDsRatsInACage(I2SClocklessLedDriver *driver, uint8_t *states, bool *dirty_states) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
@@ -40,6 +41,7 @@ public:
     hop_ = 3;
     tail_length_ = 1;
     dirty_ = false;
+    hueSpeed_ = random8(8);
   };
 
   void clear_dirty_flags() {
@@ -49,9 +51,6 @@ public:
   };
 
   void init() {
-    
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
-    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     
     int rnd_offset = random(this->jitter_) - (this->jitter_/2);
     this->clear_dirty_flags();
@@ -64,12 +63,16 @@ public:
       }
 //      Serial.println(this->leds_state_[(i+rnd_offset)]);
     }
+    this->hueSpeed_ = random(8);
   };
 
   void update_model(LEDsPaletteController paletteCtl, int index) { 
 
-    if (index < 8) {
-      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, index, 128, paletteCtl.currentBlending_);
+
+    if (index < 14) {
+      uint8_t hue_ = beatsin8(this->hueSpeed_, 0, 255);
+      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, hue_, 128, paletteCtl.currentBlending_);
+      this->currentHSV_ = CHSV(this->currentHSV_.h, MIN((this->currentHSV_.s + random8(8)), 255), this->currentHSV_.v);
     } else {
       this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     }

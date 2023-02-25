@@ -64,6 +64,11 @@ public:
     Serial.println("----------");
     for (int ll=0; ll<NUM_LEVELS; ll++) {
       this->lvls_[ll] = beatsin8(this->speeds_[ll], 2, this->extents_[ll]);
+
+      if ((this->lvls_[ll] > 0) && (this->lvls_[ll] < 8) && (random8() < 9)) {
+        this->extents_[ll] = (this->extents_[ll] + random8(8) - 4 + 256) % 256;
+      }
+      
       Serial.println(this->speeds_[ll]);
       Serial.println(this->lvls_[ll]);
     }

@@ -209,7 +209,10 @@ void setup() {
     leds_state_b[i] = 0;
   }
 
-  presets.init();
+  
+  presets.init(10);
+
+  
   lightSides.init();
   triggerLevels.init();
   triggerLevelSweeps.init(1);
@@ -246,6 +249,8 @@ void loop() {
     __param5 = (int)chosen_preset[5];
     __param6 = (int)chosen_preset[6];
     __param7 = (int)chosen_preset[7];
+
+    paletteCtl.chooseColorPalette(__param7);
 #endif
     last_preset_ms = millis();
     current_preset_dur_ms = (random(10) + 2) * 2500; // 5 -> 30 seconds in 2.5 second increments
@@ -255,7 +260,8 @@ void loop() {
 
     if       (_mode == LIGHT_SIDES)                   {
       lightSides.init();
-      paletteCtl.chooseColorPalette(__param7);
+      lightSides.mirror_ = __param2;
+      
     }
     
     else if       (_mode == TWINKLE_STARS)                   {
@@ -264,13 +270,13 @@ void loop() {
       twinkleStars.speed_lo_ = __param3;
       twinkleStars.speed_hi_ = __param4;
 
-      paletteCtl.chooseColorPalette(__param7);
     }
 
     else if  (_mode == ROTATE_BANDS)                    {
       rotateBands.init();
       rotateBands.speed_ = __param2;
       rotateBands.num_bands_ = __param3;
+      rotateBands.dir_ = __param3;
     }
 
     // else if  (_mode == ROTATE_SUM_OF_SINES)             { rotateSines.init(); rotateSines.angular_speed_ = __param2;  rotateSines.number_ = __param3;  rotateSines.offset_ = __param4;  rotateSines.thickness_ = __param5;  }
@@ -283,8 +289,6 @@ void loop() {
       ratsInACage.prob_ = __param4;
       ratsInACage.hop_ = __param5;
       ratsInACage.tail_length_ = __param6;
-
-      paletteCtl.chooseColorPalette(__param7);
     }
 
     else if  (_mode == SNOWFALL)                        {
@@ -337,12 +341,15 @@ void loop() {
       triggerLevelFades.init(-1);
       triggerLevelFades.speed_ = __param2;
       triggerLevelFades.offset_ = __param3;
+      triggerLevelFades.pulse_speed_ = __param4;
     }
 
     else if  (_mode == LOOP_LEVELS_FADE_UP_INIT)        {
       triggerLevelFades.init(1);
       triggerLevelFades.speed_ = __param2;
       triggerLevelFades.offset_ = __param3;
+            triggerLevelFades.pulse_speed_ = __param4;
+
     }
 
     else if  (_mode == SPIRAL_LEVELS_SWEEP_DOWN_INIT)   {
@@ -411,7 +418,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
 
-      rotateBands.loop();
+      rotateBands.loop(paletteCtl, __param7);
 
     }
 
@@ -419,7 +426,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
 
-      snowfall.update_model();
+      snowfall.update_model(paletteCtl, __param7);
       snowfall.loop();
 
     }
@@ -439,7 +446,7 @@ void loop() {
       clear_leds();
 
       // up is down, down is up, peace is war
-      triggerLevels.update_model(1);
+      triggerLevels.update_model(1, paletteCtl, __param7);
       triggerLevels.loop();
     }
 
@@ -448,7 +455,7 @@ void loop() {
     if ((millis() % __param1) < 10) {
       clear_leds();
 
-      triggerLevels.update_model(-1);
+      triggerLevels.update_model(-1, paletteCtl, __param7);
       triggerLevels.loop();
     }
 
@@ -463,7 +470,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
       //     clear_leds();
-      triggerLevelSweeps.update_model(1);
+      triggerLevelSweeps.update_model(1, paletteCtl, __param7);
       triggerLevelSweeps.loop();
     }
 
@@ -477,7 +484,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
       //     clear_leds();
-      triggerLevelSweeps.update_model(-1);
+      triggerLevelSweeps.update_model(-1, paletteCtl, __param7);
       triggerLevelSweeps.loop();
     }
 
@@ -494,7 +501,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
       //     clear_leds();
-      spiralLevelSweeps.update_model(1);
+      spiralLevelSweeps.update_model(1, paletteCtl, __param7);
       spiralLevelSweeps.loop();
     }
 
@@ -508,7 +515,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
       //     clear_leds();
-      spiralLevelSweeps.update_model(-1);
+      spiralLevelSweeps.update_model(-1, paletteCtl, __param7);
       spiralLevelSweeps.loop();
     }
 
@@ -524,7 +531,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
       //     clear_leds();
-      triggerLevelFades.update_model(1);
+      triggerLevelFades.update_model(1, paletteCtl, __param7);
       triggerLevelFades.loop();
     }
 
@@ -538,7 +545,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
       //     clear_leds();
-      triggerLevelFades.update_model(-1);
+      triggerLevelFades.update_model(-1, paletteCtl, __param7);
       triggerLevelFades.loop();
     }
 

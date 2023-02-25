@@ -23,6 +23,9 @@ private:
 public:
   int speed_;
   int num_bands_;
+  int dir_;
+  int angle_offset_;
+  int hueSpeed_;
   
   LEDsRotateBands(I2SClocklessLedDriver *driver) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
@@ -32,13 +35,17 @@ public:
     mirror_ = 2;
     angle_ = 0;
     num_bands_ = 11;
+    dir_ = 1;
+    angle_offset_ = 1;
+    hueSpeed_ = 3;
   };
 
   void init() {
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
-    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     this->angle_ = 0;
     this->num_bands_ = 11;
+    this->dir_ = 1;
+    this->angle_offset_ = 1;
+    this->hueSpeed_ = 3;
   };
 
   void draw_at_angle(int angle, CRGB currentRGB) {
@@ -66,23 +73,36 @@ public:
     }
   };
 
-  void loop() {
+  void loop(LEDsPaletteController paletteCtl, int index) {
     // update model is called at the start of each main loop func call
     // calling rgb func here should cause rainbowish randomish effect
     // call it at the change of the side var to update color in sync with side changes
-    
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+
+        
+    if (index < 14) {
+      uint8_t hue_ = beatsin8(this->hueSpeed_, 0, 255);
+      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, hue_, 128, paletteCtl.currentBlending_);
+      this->currentHSV_ = CHSV(this->currentHSV_.h, MIN((this->currentHSV_.s + random8(8)), 255), this->currentHSV_.v);
+    } else {
+      this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+    }
+
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
 
     //for (int ang; ang<360; ang++) {
-    this->angle_ = (this->angle_ + 1) % 360;
+    this->angle_ = (this->angle_ + this->angle_offset_) % 360;
+    
+    int angle__ = this->angle_;
+    if (this->dir_ < 0) {
+      angle_ = 360 - this->angle_;
+    }
 //    Serial.println(this->angle_);
     
     for (int a=0; a<this->num_bands_; a++) {
       if ((a % 2) == 0) {
-        this->draw_at_angle(((this->angle_ + (a * (360 / max(this->num_bands_, 1)))) % 360) , this->currentRGB_);
+        this->draw_at_angle(((angle__ + (a * (360 / max(this->num_bands_, 1)))) % 360) , this->currentRGB_);
       } else {
-        this->draw_at_angle(((this->angle_ + (a * (360 / max(this->num_bands_, 1)))) % 360) , CRGB::White);
+        this->draw_at_angle(((angle__ + (a * (360 / max(this->num_bands_, 1)))) % 360) , CRGB::Gray);
       }
     }
 

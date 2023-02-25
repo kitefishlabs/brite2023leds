@@ -16,11 +16,11 @@ private:
   CHSV currentHSV_;                 // current HSV color for periodic sampling whenever the light-side function is called
   CRGB currentRGB_;                 // standard temp color var conversion destination
   int currentSide_;                 // track which side we are on
-  uint8_t mirror_;
 
 
 public:
   int speed_;                       // speed of evolution of HSV color
+  uint8_t mirror_;
 
   LEDsLightSide(I2SClocklessLedDriver *driver) {      // int sides[2][NUMSTRIPS][5]
     driver_ = driver;
@@ -41,12 +41,12 @@ public:
   };
 
   void update_model(LEDsPaletteController paletteCtl, int index) {
-    // update model is called at the start of each main loop func call
-    // calling rgb func that changes here should cause rainbowish randomish effect
-    // call it at the change of the side var to update color in sync with side changes
-    //    Serial.print("index: "); Serial.print(index); Serial.print(", R: "); Serial.print(this->currentRGB_.r); Serial.print(", G: "); Serial.print(this->currentRGB_.g); Serial.print(", B: "); Serial.println(this->currentRGB_.b);
-    
-    this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, index, 128, paletteCtl.currentBlending_);
+
+    if (index < 14) {
+      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, index, 128, paletteCtl.currentBlending_);
+    } else {
+      this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+    }
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
 
 //     Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 

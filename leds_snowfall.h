@@ -23,6 +23,7 @@ public:
   int spacer_;
   int jitter_;
   int restart_prob_;
+  uint8_t hueSpeed_;
 
   LEDsSnowfall(I2SClocklessLedDriver *driver, float *angle_state) {
     driver_ = driver;
@@ -34,6 +35,7 @@ public:
     spacer_ = 6;
     jitter_ = 9; 
     restart_prob_ = 8;
+    hueSpeed_ = 2;
   };
 
   void init() {
@@ -51,22 +53,29 @@ public:
         rnd_offset = random(this->jitter_) - (this->jitter_/2);
       }
     }
+    this->hueSpeed_ = random(8);
   };
 
-  void load_preset(int *preset) {
-    this->fall_speed_ = preset[1];
-    this->spacer_ = preset[2];
-    this->jitter_ = preset[3];
-    this->restart_prob_ = preset[4];
-    this->init();
-  };
+//  void load_preset(int *preset) {
+//    this->fall_speed_ = preset[1];
+//    this->spacer_ = preset[2];
+//    this->jitter_ = preset[3];
+//    this->restart_prob_ = preset[4];
+//    this->init();
+//  };
 
-  void update_model() {
+  void update_model(LEDsPaletteController paletteCtl, int index) {
 
-    this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), 0);
-    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
+    if (index < 14) {
+      uint8_t hue_ = beatsin8(this->hueSpeed_, 0, 255);
+      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, hue_, 128, paletteCtl.currentBlending_);
+      this->currentHSV_ = CHSV(this->currentHSV_.h, MIN((this->currentHSV_.s + random8(8)), 255), this->currentHSV_.v);
+    } else {
+      this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
+    }
     
-    for (int ang=0; ang<360; ang++) { 
+    for (int ang=0; ang<360; ang++) {
+      
       if ((this->angle_state_[ang] >= 0.5) && (random8() > 24)) {
         this->angle_state_[ang] -= (0.001 * float(this->fall_speed_)) + (float(random8())/25600.0);
 //        Serial.println(this->angle_state_[ang]);
