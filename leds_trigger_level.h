@@ -68,7 +68,7 @@ public:
 
   void light_level() {
 
-    Serial.print("light lvl: ");Serial.print(this->currentSide_); Serial.print(" "); Serial.println(this->currentLevel_);
+//    Serial.print("light lvl: ");Serial.print(this->currentSide_); Serial.print(" "); Serial.println(this->currentLevel_);
       
     int r = LEVELS[this->currentLevel_][this->currentSide_][0];
     int o = LEVELS[this->currentLevel_][this->currentSide_][1];

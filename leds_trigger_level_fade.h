@@ -18,7 +18,6 @@ private:
   uint8_t currentLevel_;
   uint8_t currentSide_;
   int counter_;
-  uint8_t mirror_;
   int lvls_[NUM_LEVELS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   
 public:
@@ -26,6 +25,7 @@ public:
   int offset_;
   int pulse_speed_;
   uint8_t hueSpeed_;
+  uint8_t mirror_;
   
   LEDsTriggerLevelFade(I2SClocklessLedDriver *driver) {
     driver_ = driver;
@@ -63,11 +63,6 @@ public:
       Serial.println(this->lvls_[i]);
     }
   }
-
-  void setup() {
-    this->init(1);
-  };
-
 
   void update_model(int dir, LEDsPaletteController paletteCtl, int index) {
     

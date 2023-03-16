@@ -48,7 +48,7 @@ public:
       if (random(1000) < this->density_) {
         this->leds_state_[i] = 1;
         this->leds_speed_state_[i] = random8(this->speed_lo_, this->speed_hi_);
-        Serial.print(i); Serial.print(" "); Serial.print(leds_state_[i]); Serial.print(" "); Serial.println(leds_speed_state_[i]);
+//        Serial.print(i); Serial.print(" "); Serial.print(leds_state_[i]); Serial.print(" "); Serial.println(leds_speed_state_[i]);
       }
     }
   };

@@ -34,7 +34,7 @@ public:
     currentSide_ = 0;
     speed_ = 1;
     counter_ = 0;
-    mirror_ = 3;
+    mirror_ = 2;
     offset_ = 40;
     hueSpeed_ = 2;
   };
@@ -50,7 +50,7 @@ public:
     this->currentSide_ = 0;
     this->speed_ = 1;
     this->counter_ = 0;
-    this->mirror_ = 3;
+    this->mirror_ = 2;
     this->offset_ = 40;
     for (int i=0; i<NUM_LEVELS; i++) {
       this->lvls_[i] = 0;
@@ -71,16 +71,17 @@ public:
 //    Serial.print("cur lvl: "); Serial.println(this->currentLevel_);
 //    Serial.print("lvl val: "); Serial.println(this->lvls_[((this->currentLevel_+dir)%NUM_LEVELS)]);
 //    for (int i=0; i<NUM_LEVELS; i++) {
-//      Serial.println(this->lvls_[i]);
+//      Serial.print(this->lvls_[i]); Serial.print(" ");
 //    }
+//    Serial.println("");
 
     if (((this->counter_ % this->offset_) == 0) && (this->lvls_[this->currentLevel_] == 0)) {
       
-      // Serial.print("LVL: ");  Serial.println(this->currentLevel_);
-//      if (this->currentLevel_ == 0) {
-//        this->currentSide_ = 1 - this->currentSide_;
+//       Serial.print("LVL: ");  Serial.println(this->currentLevel_);
+      if (this->currentLevel_ == 0) {
+        this->currentSide_ = 1 - this->currentSide_;
 //        Serial.print("lvl == 0 detected sd="); Serial.println(this->currentSide_);
-//      }
+      }
       this->lvls_[this->currentLevel_] = 1;
       this->currentLevel_ = (this->currentLevel_ + dir + NUM_LEVELS) % NUM_LEVELS;
     }
@@ -92,10 +93,11 @@ public:
     } else {
       this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     }
+    hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
     
     // Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
-    // Serial.println(this->currentSide_);
-    // Serial.println(this->currentLevel_);
+//     Serial.println(this->currentSide_);
+//     Serial.println(this->currentLevel_);
     // Serial.print(this->currentRGB_.r); Serial.print(" "); Serial.print(this->currentRGB_.g); Serial.print(" "); Serial.println(this->currentRGB_.b);
   };
 
@@ -109,10 +111,12 @@ public:
     int start = 0;
     int j = 0;
   
-    // Serial.print("lvl: "); Serial.println(this->currentLevel_);
+//     Serial.print("lvl: "); Serial.println(this->currentLevel_);
     for (int ll = 0; ll < NUM_LEVELS; ll++) {
-      // Serial.print("LL: "); Serial.println(ll);  
+       
       if (this->lvls_[ll] > 0) {
+
+//        Serial.print("LL: "); Serial.println(ll);  
         
         r = LEVELS[ll][this->currentSide_][0];
         o = LEVELS[ll][this->currentSide_][1];
@@ -125,10 +129,12 @@ public:
         
           j = start + this->lvls_[ll];
 
+//          Serial.print("j: "); Serial.print(j); Serial.print(", r: "), Serial.print(this->currentRGB_.r), Serial.print(", g: "), Serial.print(this->currentRGB_.g), Serial.print(", b: "), Serial.println(this->currentRGB_.b);
+
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
           if (j >= start+(d*l)) {
             this->lvls_[ll] = 0;
-            // Serial.print("LL----------------------------->0 (++) "); Serial.println(ll);
+//             Serial.print("LL----------------------------->0 (++) "); Serial.println(ll);
           } else {
             this->lvls_[ll] = (this->lvls_[ll] + 1);
           }
@@ -139,7 +145,7 @@ public:
           this->driver_->setPixel(j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
           if (j <= (start+(d*l))) {
             this->lvls_[ll] = 0;
-            // Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
+//             Serial.print("LL-------------------------->0 (--) "); Serial.println(ll); 
           } else {
             this->lvls_[ll] = (this->lvls_[ll] + 1);
           }
@@ -171,7 +177,7 @@ public:
       this->currentSide_ = 1 - this->currentSide_;
       this->light_level();
     }
-    this->counter_ = (this->counter_ + 1) % 10000;
+    this->counter_ = (this->counter_ + 1) % 1000000;
     this->driver_->showPixels();
   };
 

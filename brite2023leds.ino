@@ -210,7 +210,7 @@ void setup() {
   }
 
   
-  presets.init(10);
+  presets.init(9);
 
   
   lightSides.init();
@@ -237,8 +237,8 @@ void loop() {
 
   if ((millis() - last_preset_ms) > current_preset_dur_ms) {
   #ifndef SINGLE_MODE
-//    int choice = presets.get_weighted_random_preset();
-    int choice = presets.get_next_preset();
+    int choice = presets.get_weighted_random_preset();
+//    int choice = presets.get_next_preset();
     int* chosen_preset = PRESETS[choice];
     //    Serial.println((int)chosen_preset[0]);
     __mode = (int)chosen_preset[0];
@@ -248,15 +248,13 @@ void loop() {
     __param4 = (int)chosen_preset[4];
     __param5 = (int)chosen_preset[5];
     __param6 = (int)chosen_preset[6];
-    __param7 = (int)chosen_preset[7];
+//    __param7 = (int)chosen_preset[7];
+    __param7 = random8(24);
 
     paletteCtl.chooseColorPalette(__param7);
 #endif
     last_preset_ms = millis();
     current_preset_dur_ms = (random(10) + 2) * 2500; // 5 -> 30 seconds in 2.5 second increments
-
-    triggerTopTop.update_model(paletteCtl, __param7);
-    triggerTopTop.loop();
 
     if       (_mode == LIGHT_SIDES)                   {
       lightSides.init();
@@ -337,6 +335,12 @@ void loop() {
       triggerLevelSweeps.offset_ = __param3;
     }
 
+//  int speed_;
+//  int offset_;
+//  int pulse_speed_;
+//  uint8_t hueSpeed_;
+//  uint8_t mirror_;
+
     else if  (_mode == LOOP_LEVELS_FADE_DOWN_INIT)      {
       triggerLevelFades.init(-1);
       triggerLevelFades.speed_ = __param2;
@@ -348,7 +352,7 @@ void loop() {
       triggerLevelFades.init(1);
       triggerLevelFades.speed_ = __param2;
       triggerLevelFades.offset_ = __param3;
-            triggerLevelFades.pulse_speed_ = __param4;
+      triggerLevelFades.pulse_speed_ = __param4;
 
     }
 
@@ -367,6 +371,10 @@ void loop() {
     }
 
   }
+
+  
+   triggerTopTop.update_model(paletteCtl, __param7);
+   triggerTopTop.loop();
 
   if (__mode != _mode) {
     Serial.print("Mode changed from "); Serial.print(_mode); Serial.print(" to: "); Serial.println(__mode);
@@ -388,7 +396,7 @@ void loop() {
 
     if ((millis() % __param1) < 10) {
 
-      clear_leds();
+//      clear_leds();
       lightSides.update_model(paletteCtl, __param7);
       lightSides.loop();
 
@@ -529,7 +537,7 @@ void loop() {
 
   } else if (_mode == LOOP_LEVELS_FADE_UP) {
 
-    if ((millis() % __param1) < 10) {
+    if ((millis() % __param1) < 2) {
       //     clear_leds();
       triggerLevelFades.update_model(1, paletteCtl, __param7);
       triggerLevelFades.loop();
@@ -543,7 +551,7 @@ void loop() {
 
   } else if (_mode == LOOP_LEVELS_FADE_DOWN) {
 
-    if ((millis() % __param1) < 10) {
+    if ((millis() % __param1) < 2) {
       //     clear_leds();
       triggerLevelFades.update_model(-1, paletteCtl, __param7);
       triggerLevelFades.loop();

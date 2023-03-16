@@ -47,12 +47,12 @@ public:
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_);
     delay(1000);
-    Serial.println("---------->>>>");
+//    Serial.println("---------->>>>");
     this->speed_ = 1;
     for (int ll=0; ll<NUM_LEVELS; ll++) {
       this->lvls_[ll] = 0;
       this->speeds_[ll] = random8(this->speed_lo_, this->speed_hi_);
-      Serial.println(this->speeds_[ll]);
+//      Serial.println(this->speeds_[ll]);
       this->extents_[ll] = random8();
     }
   };
@@ -61,7 +61,7 @@ public:
     
     this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
-    Serial.println("----------");
+//    Serial.println("----------");
     for (int ll=0; ll<NUM_LEVELS; ll++) {
       this->lvls_[ll] = beatsin8(this->speeds_[ll], 2, this->extents_[ll]);
 
@@ -69,8 +69,8 @@ public:
         this->extents_[ll] = (this->extents_[ll] + random8(8) - 4 + 256) % 256;
       }
       
-      Serial.println(this->speeds_[ll]);
-      Serial.println(this->lvls_[ll]);
+//      Serial.println(this->speeds_[ll]);
+//      Serial.println(this->lvls_[ll]);
     }
     
   };

@@ -43,7 +43,9 @@ public:
   void update_model(LEDsPaletteController paletteCtl, int index) {
 
     if (index < 14) {
-      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, index, 128, paletteCtl.currentBlending_);
+      int hueIndexer = beatsin8(min(max(speed_, 0), 15), 0, 255);
+//      Serial.println(hueIndexer);
+      this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, hueIndexer, 128, paletteCtl.currentBlending_);
     } else {
       this->currentHSV_ = CHSV(beatsin8(3*this->speed_,0,255), beatsin8(5*this->speed_,120,240), beatsin8(7*this->speed_,48,200));
     }

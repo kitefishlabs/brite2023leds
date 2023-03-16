@@ -23,11 +23,27 @@ public:
   }
 
   void setupCustomPalette(uint8_t hueA, uint8_t hueB, uint8_t sat, uint8_t valu) {
+//      Serial.println("New custom pallete: ");
       for (int i=0; i<16; i++) {
         if (hueB >= hueA) {
+//          Serial.println("");
           this->currentPalette_[i] = CHSV(hueA + (i * ((hueB - hueA) / 16)), sat, valu);
+//          Serial.println("---------------------");
+//          Serial.print("+i: "); Serial.print(i);
+//          Serial.print(", hueA: "); Serial.print(hueA);
+//          Serial.print(", hueB: "); Serial.println(hueB);
+//          Serial.println(this->currentPalette_[i].h);
+//          Serial.println(this->currentPalette_[i].s);
+//          Serial.println(this->currentPalette_[i].v);
         } else {
+//          Serial.println("---------------------");
           this->currentPalette_[i] = CHSV(hueB + (i * ((hueA - hueB) / 16)), sat, valu);
+//          Serial.print("-i: "); Serial.print(i);
+//          Serial.print(", hueA: "); Serial.print(hueA);
+//          Serial.print(", hueB: "); Serial.println(hueB);
+//          Serial.println(this->currentPalette_[i].h);
+//          Serial.println(this->currentPalette_[i].s);
+//          Serial.println(this->currentPalette_[i].v);
         }
       }
       this->currentBlending_ = NOBLEND;
@@ -78,27 +94,27 @@ public:
         break;
       
        case 8:
-        this->setupCustomPalette(HUE_BLUE, HUE_GREEN, 180, 200);
+        this->setupCustomPalette(BLUE, GREEN, 180, 200);
          break;
 //      
        case 9:
-         this->setupCustomPalette(HUE_BLUE, HUE_YELLOW, 180, 200);
+         this->setupCustomPalette(BLUE, PINK, 180, 200);
          break;
 
        case 10:
-        this->setupCustomPalette(HUE_YELLOW, HUE_RED, 180, 200);
+        this->setupCustomPalette(YELLOW, ORANGE, 180, 200);
          break;
 //      
        case 11:
-         this->setupCustomPalette(HUE_RED, HUE_BLUE, 180, 200);
+         this->setupCustomPalette(RED, ORANGE, 180, 200);
          break;
 
         case 12:
-        this->setupCustomPalette(HUE_PURPLE, HUE_RED, 180, 200);
+        this->setupCustomPalette(PURPLE, RED, 180, 200);
          break;
 //      
        case 13:
-         this->setupCustomPalette(HUE_GREEN, HUE_PURPLE, 180, 200);
+         this->setupCustomPalette(GREEN, PURPLE, 180, 200);
          break;
       
       default:

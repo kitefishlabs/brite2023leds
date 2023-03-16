@@ -59,10 +59,10 @@ public:
     for (int i=0; i<NUM_LEVELS; i++) {
       this->lvls_[i] = 0;
     }
-    Serial.println("INIT");
-    for (int i=0; i<NUM_LEVELS; i++) {
-      Serial.println(this->lvls_[i]);
-    }
+//    Serial.println("INIT");
+//    for (int i=0; i<NUM_LEVELS; i++) {
+//      Serial.println(this->lvls_[i]);
+//    }
   }
 
   void setup() {
@@ -76,14 +76,14 @@ public:
     // call it at the change of the side var to update color in sync with side changes
     
 
-    Serial.print("counter: "); Serial.println(this->counter_);
-    Serial.print("cur lvl: "); Serial.println(this->currentLevel_);
-    Serial.print("dir: "); Serial.println(dir);
+//    Serial.print("counter: "); Serial.println(this->counter_);
+//    Serial.print("cur lvl: "); Serial.println(this->currentLevel_);
+//    Serial.print("dir: "); Serial.println(dir);
     
-    Serial.print("lvl val: "); Serial.println(this->lvls_[((this->currentLevel_+dir)%NUM_LEVELS)]);
-    for (int i=0; i<NUM_LEVELS; i++) {
-      Serial.println(this->lvls_[i]);
-    }
+//    Serial.print("lvl val: "); Serial.println(this->lvls_[((this->currentLevel_+dir)%NUM_LEVELS)]);
+//    for (int i=0; i<NUM_LEVELS; i++) {
+//      Serial.print(this->lvls_[i]); Serial.print(" ");
+//    }
 
     // Serial.println(">>>>>");
     // Serial.println(this->currentLevel_);
@@ -109,7 +109,7 @@ public:
     } else {
       this->counter_ += 1;
 //      if ((this->mirror_ == 2) && (this->currentSide_ == 1)) {
-//        this->lvls_[this->currentLevel_] += 1;
+      this->lvls_[this->currentLevel_] += 1;
 //      }
     }
 

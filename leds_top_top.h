@@ -39,7 +39,7 @@ public:
     // call it at the change of the side var to update color in sync with side changes
 
 //    Serial.print("index: "); Serial.print(index); Serial.print(", R: "); Serial.print(this->currentRGB_.r); Serial.print(", G: "); Serial.print(this->currentRGB_.g); Serial.print(", B: "); Serial.println(this->currentRGB_.b);
-    this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, index, 128, paletteCtl.currentBlending_);
+    this->currentHSV_ = ColorFromPalette( paletteCtl.currentPalette_, beatsin8(9, 0, 256), 96, paletteCtl.currentBlending_);
     hsv2rgb_rainbow( this->currentHSV_, this->currentRGB_ );
 
 //     Serial.print(this->currentHSV_.hue); Serial.print(" "); Serial.print(this->currentHSV_.saturation); Serial.print(" "); Serial.println(this->currentHSV_.value); Serial.print(" "); 
@@ -52,7 +52,7 @@ public:
     // light-sides is a one-shot, so this loop is executed once when the whole side updates.
     // one-shot effects allow us to use conventional for-loops in the effect's loop() function
 
-        for (int j=0; j<PW[12]; j++) {
+        for (int j=0; j<NUM_LEDS_PER_STRIP; j++) {
 //          hard-wiring this one
           this->driver_->setPixel((7 * NUM_LEDS_PER_STRIP) + j, this->currentRGB_.r, this->currentRGB_.g, this->currentRGB_.b);
 

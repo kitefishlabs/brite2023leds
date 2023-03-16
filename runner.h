@@ -7,7 +7,7 @@
 #include "colors.h"
 #include "modes.h"
 
-#define NUM_PRESETS 180
+#define NUM_PRESETS 150
 
 int PRESETS[NUM_PRESETS][8] = {
     // { DARK,                           period,  0,          0,          0,            0,            0,            0,      },
@@ -35,32 +35,32 @@ int PRESETS[NUM_PRESETS][8] = {
     { DARK,                            0,     0,          0,        0,            0,          0,      0 },
     { DARK,                            0,     0,          0,        0,            0,          0,      0 },
     { DARK,                            0,     0,          0,        0,            0,          0,      0 },
-    { DARK,                            0,     0,          0,        0,            0,          0,      0 },
-    { DARK,                            0,     0,          0,        0,            0,          0,      0 },
-    { DARK,                            0,     0,          0,        0,            0,          0,      0 },
-    { DARK,                            0,     0,          0,        0,            0,          0,      0 },
+    { TEST_CHASERS,                    2,     0,          0,        0,            0,          0,      0 },
+    { TEST_CHASERS,                   20,     0,          0,        0,            0,          0,      0 },
+    { TEST_CHASERS,                   40,     0,          0,        0,            0,          0,      0 },
+    { TEST_CHASERS,                   15,     0,          0,        0,            0,          0,      0 },
     
     { TEST_CHASERS,                   10,     0,          0,        0,            0,          0,      0 },
     { TEST_CHASERS,                    5,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                   20,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                    2,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                   10,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                    5,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                   10,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                    2,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                   20,     0,          0,        0,            0,          0,      0 },
-    { TEST_CHASERS,                   10,     0,          0,        0,            0,          0,      0 },
+    { TEST_CHASERS,                   20,     0,          0,        0,            0,          0,      1 },
+    { TEST_CHASERS,                    2,     0,          0,        0,            0,          0,      2 },
+    { TEST_CHASERS,                   10,     0,          0,        0,            0,          0,      3 },
+    { TEST_CHASERS,                    5,     0,          0,        0,            0,          0,      4 },
+    { TEST_CHASERS,                   10,     0,          0,        0,            0,          0,      5 },
+    { TEST_CHASERS,                    2,     0,          0,        0,            0,          0,      6 },
+    { TEST_CHASERS,                   20,     0,          0,        0,            0,          0,      7 },
+    { TEST_CHASERS,                   10,     0,          0,        0,            0,          0,      8 },
     
-    { LIGHT_SIDES,                  4000,     2,          0,        0,            0,          0,      0 },
-    { LIGHT_SIDES,                  3000,     2,          0,        0,            0,          0,      1 },
-    { LIGHT_SIDES,                  3500,     3,          0,        0,            0,          0,      2 },
-    { LIGHT_SIDES,                  1500,     2,          0,        0,            0,          0,      3 },
-    { LIGHT_SIDES,                  6000,     2,          0,        0,            0,          0,      4 },
-    { LIGHT_SIDES,                  2500,     3,          0,        0,            0,          0,      5 },
-    { LIGHT_SIDES,                  2500,     3,          0,        0,            0,          0,      6 },
-    { LIGHT_SIDES,                  3000,     0,          0,        0,            0,          0,      7 },
-    { LIGHT_SIDES,                  2200,     2,          0,        0,            0,          0,      0 },
-    { LIGHT_SIDES,                  3000,     1,          0,        0,            0,          0,      1 },
+    { LIGHT_SIDES,                   10,     2,          0,        0,            0,          0,      9 },
+    { LIGHT_SIDES,                   10,     2,          0,        0,            0,          0,     10 },
+    { LIGHT_SIDES,                   10,     3,          0,        0,            0,          0,     11 },
+    { LIGHT_SIDES,                   10,     2,          0,        0,            0,          0,     12 },
+    { LIGHT_SIDES,                   10,     2,          0,        0,            0,          0,     13 },
+    { LIGHT_SIDES,                   10,     3,          0,        0,            0,          0,     14 },
+    { LIGHT_SIDES,                   10,     3,          0,        0,            0,          0,     15 },
+    { LIGHT_SIDES,                   10,     0,          0,        0,            0,          0,      0 },
+    { LIGHT_SIDES,                   10,     2,          0,        0,            0,          0,      1 },
+    { LIGHT_SIDES,                   10,     1,          0,        0,            0,          0,      2 },
 
     
     { TWINKLE_STARS,                  10,     100,        3,        45,           0,          0,      9 },
@@ -72,7 +72,7 @@ int PRESETS[NUM_PRESETS][8] = {
     { TWINKLE_STARS,                  15,      75,        3,        25,           0,          0,     10 },
     { TWINKLE_STARS,                  10,      15,       35,       145,           0,          0,     11 },
     { TWINKLE_STARS,                  12,      50,        3,        25,           0,          0,     12 },
-    { TWINKLE_STARS,                  15,      20,       35,        95,           0,          0,      8 },
+    { TWINKLE_STARS,                  15,      20,       35,        95,           0,          0,     13 },
   
 //
     { ROTATE_BANDS,                   12,      1,          4,        1,           0,          0,      0 },
@@ -133,51 +133,51 @@ int PRESETS[NUM_PRESETS][8] = {
    { FAKE_SPECTRA,                     2,     24,       256,        32,         192,          0,      9 },
 
 // 
-   { TRIGGER_LEVELS_DOWN,             250,      1,        45,         0,           0,          0,      0 },
-   { TRIGGER_LEVELS_DOWN,             450,      1,        20,         0,           0,          0,      2 },
-   { TRIGGER_LEVELS_DOWN,             150,      1,        15,         0,           0,          0,      4 },
-   { TRIGGER_LEVELS_DOWN,             50,      1,         8,         0,           0,          0,      6 },
-   { TRIGGER_LEVELS_DOWN,             350,      1,         6,         0,           0,          0,      8 },
+   { TRIGGER_LEVELS_DOWN,             250,      1,        45,         0,           0,          0,      13 },    // 90
+   { TRIGGER_LEVELS_DOWN,             450,      1,        20,         0,           0,          0,      12 },
+   { TRIGGER_LEVELS_DOWN,             150,      1,        15,         0,           0,          0,      11 },
+   { TRIGGER_LEVELS_DOWN,             90,      1,         8,         0,           0,          0,      10 },
+   { TRIGGER_LEVELS_DOWN,             350,      1,         6,         0,           0,          0,      9 },
    
-   { TRIGGER_LEVELS_UP,               450,      1,        45,         0,           0,          0,      1 },
-   { TRIGGER_LEVELS_UP,               250,      1,        20,         0,           0,          0,      3 },
-   { TRIGGER_LEVELS_UP,               150,      1,        15,         0,           0,          0,      5 },
-   { TRIGGER_LEVELS_UP,               50,      1,         8,         0,           0,          0,      7 },
+   { TRIGGER_LEVELS_UP,               450,      1,        45,         0,           0,          0,      13 },
+   { TRIGGER_LEVELS_UP,               250,      1,        20,         0,           0,          0,      12 },
+   { TRIGGER_LEVELS_UP,               150,      1,        15,         0,           0,          0,      11 },
+   { TRIGGER_LEVELS_UP,               120,      1,         8,         0,           0,          0,      10 },
    { TRIGGER_LEVELS_UP,               350,      1,         6,         0,           0,          0,      9 },
    
-   { LOOP_LEVELS_SWEEP_DOWN_INIT,      5,      1,        42,         0,           0,          0,      0 },
-   { LOOP_LEVELS_SWEEP_DOWN_INIT,      5,      1,        20,         0,           0,          0,      2 },
-   { LOOP_LEVELS_SWEEP_DOWN_INIT,      5,      1,        12,         0,           0,          0,      4 },
-   { LOOP_LEVELS_SWEEP_DOWN_INIT,      5,      1,         8,         0,           0,          0,      6 },
-   { LOOP_LEVELS_SWEEP_DOWN_INIT,      5,      1,         6,         0,           0,          0,      8 },
+   { LOOP_LEVELS_SWEEP_DOWN_INIT,      45,      1,        42,         0,           0,          0,      0 },
+   { LOOP_LEVELS_SWEEP_DOWN_INIT,      50,      1,        20,         0,           0,          0,      2 },
+   { LOOP_LEVELS_SWEEP_DOWN_INIT,      25,      1,        12,         0,           0,          0,      7 },
+   { LOOP_LEVELS_SWEEP_DOWN_INIT,      35,      1,         8,         0,           0,          0,      9 },
+   { LOOP_LEVELS_SWEEP_DOWN_INIT,      50,      1,         6,         0,           0,          0,     12 },
 //    
-   { LOOP_LEVELS_SWEEP_UP_INIT,        5,      1,        42,         0,           0,          0,      1 },
-   { LOOP_LEVELS_SWEEP_UP_INIT,        5,      1,        20,         0,           0,          0,      3 },
-   { LOOP_LEVELS_SWEEP_UP_INIT,        5,      1,        12,         0,           0,          0,      5 },
-   { LOOP_LEVELS_SWEEP_UP_INIT,        5,      1,         8,         0,           0,          0,      7 },
-   { LOOP_LEVELS_SWEEP_UP_INIT,        5,      1,         6,         0,           0,          0,      9 },
+   { LOOP_LEVELS_SWEEP_UP_INIT,        50,      1,        42,         0,           0,          0,      1 },
+   { LOOP_LEVELS_SWEEP_UP_INIT,        45,      1,        20,         0,           0,          0,      5 },
+   { LOOP_LEVELS_SWEEP_UP_INIT,        30,      1,        12,         0,           0,          0,     10 },
+   { LOOP_LEVELS_SWEEP_UP_INIT,        35,      1,         8,         0,           0,          0,     11 },
+   { LOOP_LEVELS_SWEEP_UP_INIT,        25,      1,         6,         0,           0,          0,     13 },
 //    
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        35,         5,           0,          0,      0 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        35,         9,           0,          0,      1 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        10,         3,           0,          0,      2 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        10,         2,           0,          0,      3 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        25,         1,           0,          0,      4 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        25,         7,           0,          0,      5 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        20,         1,           0,          0,      6 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        20,         3,           0,          0,      7 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        15,         1,           0,          0,      8 },
-   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      1,        15,         4,           0,          0,      9 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       15,      1,        35,         1,           0,          0,      0 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       15,      9,        35,         3,           0,          0,      1 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       35,      5,        10,         5,           0,          0,      2 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       25,      7,        10,         9,           0,          0,      3 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       15,      9,        25,         1,           0,          0,      4 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       15,     11,        25,         9,           0,          0,      5 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       15,     15,        20,         7,           0,          0,      6 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       25,      9,        20,         3,           0,          0,      7 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       5,      12,        15,         5,           0,          0,      8 },
+   { LOOP_LEVELS_FADE_DOWN_INIT,       5,       3,        15,         1,           0,          0,      9 },
 //    
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        35,         7,           0,          0,      0 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        35,         3,           0,          0,      1 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        10,         5,           0,          0,      2 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        10,         1,           0,          0,      3 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        25,         6,           0,          0,      4 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        25,         7,           0,          0,      5 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        20,         1,           0,          0,      6 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        20,         3,           0,          0,      7 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        15,         5,           0,          0,      8 },
-   { LOOP_LEVELS_FADE_UP_INIT,         5,      1,        15,         9,           0,          0,      9 },
+   { LOOP_LEVELS_FADE_UP_INIT,         15,      1,        35,         7,           0,          0,      0 },
+   { LOOP_LEVELS_FADE_UP_INIT,         25,      7,        35,         3,           0,          0,      1 },
+   { LOOP_LEVELS_FADE_UP_INIT,         25,      6,        10,         5,           0,          0,      2 },
+   { LOOP_LEVELS_FADE_UP_INIT,         25,      7,        10,         1,           0,          0,      3 },
+   { LOOP_LEVELS_FADE_UP_INIT,         25,      5,        25,         6,           0,          0,      4 },
+   { LOOP_LEVELS_FADE_UP_INIT,         15,      3,        25,         7,           0,          0,      5 },
+   { LOOP_LEVELS_FADE_UP_INIT,         35,      9,        20,         1,           0,          0,      6 },
+   { LOOP_LEVELS_FADE_UP_INIT,         35,     13,        20,         3,           0,          0,      7 },
+   { LOOP_LEVELS_FADE_UP_INIT,         45,     12,        15,         5,           0,          0,      8 },
+   { LOOP_LEVELS_FADE_UP_INIT,         35,      3,        15,         9,           0,          0,      9 },
 
 //    
    { SPIRAL_LEVELS_SWEEP_DOWN_INIT,    5,      1,        40,         0,           0,          0,      0 },
@@ -231,7 +231,6 @@ public:
   int get_next_preset() {
    this->currentPreset_ = (this->currentPreset_ + 1) % NUM_PRESETS;
    Serial.print("current preset: "); Serial.println(this->currentPreset_);
-   Serial.println("CHECK CHECK CHECK!");
     return this->currentPreset_;
   };
 
